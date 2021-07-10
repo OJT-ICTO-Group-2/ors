@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<style>
+  body {
+    width: 210mm;
+    font-size: 13px;
+    font-family: arial;
+  }
+
+  p {
+    line-height: 0.5;
+  }
+
+  .col-container {
+    display: flex;
+    width: 100%;
+    /* Set full-width to expand the whole page */
+    align-items: flex-end;
+  }
+
+  .col {
+    flex: 50%;
+  }
+
+  table {
+    /* border: 1px solid black; */
+    border-collapse: collapse;
+  }
+
+  th {
+    border: 1px solid black;
+    font-size: 12px;
+  }
+
+  td {
+    border-right: 1px solid black;
+    border-left: 1px solid black;
+    padding: 2px;
+  }
+
+  th.term,
+  th.course-code {
+    width: 15%;
+  }
+
+  th.title {
+    width: 40%;
+    letter-spacing: 3px;
+  }
+
+  th.final-grade,
+  th.removal-rating,
+  th.units,
+  th.equivalent {
+    width: 7.5%;
+  }
+
+  td .center {
+    text-align: center;
+  }
+
+  dl {
+    /* width: 100%; */
+    overflow: hidden;
+    padding: 0;
+    margin: 0
+  }
+  dt {
+    display: block;
+    float: left;
+    width: 35%;
+    padding: 0;
+    margin: 0
+    clear: both;
+  }
+  dd {
+    display: block;
+    float: left;
+    width: 60%;
+    padding-left: 10px;
+    margin: 0
+  }
+
+  .column {
+    columns: 100px 2;
+    text-align: center;
+  }
+
+  .center {
+    margin: auto;
+    text-align: center;
+  }
+
+  table {
+    width: 100%;
+    border: 1px solid black;
+  }
+
+  @media print {
+      .avoid-break { break-inside: avoid; } /* page-break-after works, as well */
+  }
+  @media not print {
+    body {
+      margin: auto;
+    }
+  }
+</style>
+<head>
+	<meta charset="utf-8">
+	<title>{{ =f'{student.last_name}, {student.first_name} {student.middle_name}' }} | Transcript of Record</title>
+</head>
+<body>
+  <header-component></header-component>
+	<table>
+		<thead>
+			<tr>
+				<th class="term">Term</th>
+				<th class="course-code">Course Code</th>
+				<th class="title" colspan="2">DESCRIPTIVE TITLE</th>
+				<th class="final-grade">Final Grades</th>
+				<th class="removal-rating">Removal Rating</th>
+				<th class="units">Units of Credit</th>
+				<th class="equivalent">Equivalent</th>
+			</tr>
+		</thead>
+		<tbody>
+      {{ for term in terms: }}
+      {{ grades = term_data[term]["grades"] }}
+      <tr {{ if len(grades) == 1: }}style="border-bottom: 1px solid black;"{{ pass }}>
+        <td rowspan="{{ =len(grades) }}" style="vertical-align:top">{{ =f'{term[0]} {term[1]}' }}</td>
+        {{ for grade in grades: }}
+        <td>{{ =grade.course.code }}</td>
+        <td colspan="2">{{ =grade.course.title }}</td>
+        <td style="text-align:center">
+          {{ if grade.grade.final_grade != 4.0: }}
+          {{ =grade.grade.final_grade }}
+          {{ else: }}INC
+          {{ pass }}
+        </td>
+				<td style="text-align:center">
+          {{ if grade.grade.final_grade == 4.0: }}
+          {{ =grade.grade.removal_rating }}
+          {{ pass }}
+        </td>
+				<td style="text-align:center;{{ if len(grades) == 1: }}font-weight:bold;{{ pass }}">{{ =grade.course.units }}</td>
+				<td style="text-align:center;{{ if len(grades) == 1: }}font-weight:bold;{{ pass }}">{{ =grade.grade.equivalent }}</td>
+      </tr>
+      {{ pass }}
+      {{ if len(grades) > 1: }}
+      <tr style="border-bottom: 1px solid black;">
+				<td></td>
+				<td></td>
+				<td colspan="2"></td>
+				<td></td>
+				<td></td>
+				<td style="font-weight:bold; text-align:center; border-top: 1px solid black;">{{ =term_data[term]["units"] }}</td>
+				<td style="font-weight:bold; text-align:center; border-top: 1px solid black;">{{ =term_data[term]["equivalent"] }}</td>
+			</tr>
+      {{ pass }}
+      {{ pass }}
+			<tr style="border-top: 1px solid black;">
+				<td></td>
+				<td></td>
+				<td style="font-weight:bold" colspan="2">SUMMARY:</td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+      {{ prev_year = None }}
+      {{ for term in terms: }}
+      <tr>
+				<td></td>
+				<td></td>
+				<td style="border-right:0px; padding-left:50px">
+          {{ if prev_year != term[1]: }}
+          {{ =term[1] }}
+          {{ pass }}
+          {{ prev_year = term[1] }}
+        </td>
+				<td style="border-left:0px">{{ =term[0] }}</td>
+				<td></td>
+        <td></td>
+				<td style="text-align:center">{{ =term_data[term]["units"] }}</td>
+				<td style="text-align:center">{{ =term_data[term]["equivalent"] }}</td>
+			</tr>
+      {{ pass }}
+      <tr style="font-weight:bold">
+        <td></td>
+        <td></td>
+        <td colspan="2"></td>
+        <td></td>
+        <td></td>
+        <td style="text-align:center; border-top: 1px solid black;">{{ =summary["units"] }}</td>
+        <td style="text-align:center; border-top: 1px solid black;">{{ =summary["equivalent"] }}</td>
+      </tr>
+      <tr style="text-align:center; font-weight:bold">
+        <td></td>
+        <td></td>
+        <td colspan="2">GENERAL WEIGHTED AVERAGE</td>
+        <td style="background:yellow">{{ if summary["GWA"]: }}{{ =summary["GWA"] }}{{ pass }}</td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      {{ if student.date_graduated: }}
+      <tr style="text-align:center; border-top:1px solid black;">
+        <td colspan="8">
+          GRADUATED WITH THE DEGREE OF {{ =f'{program.name.upper()} ({program.abbreviation})' }}
+        </td>
+      </tr>
+      <tr style="text-align:center;">
+        <td colspan="8">
+          ON {{ =student.date_graduated.strftime("%B %-d, %Y").upper() }} PER REFERENDUM NO. {{ =transcript.ref_no }}, S. {{ =transcript.series }} OF THE
+        </td>
+      </tr>
+      <tr style="text-align:center;">
+        <td colspan="8">
+          BOARD OF REGENTS, BICOL UNIVERSITY, LEGAZPI CITY.
+        </td>
+      </tr>
+      {{ pass }}
+
+		</tbody>
+	</table>
+  <div class="avoid-break">
+    <br>
+    <b>EVALUATION COMMITTEE:</b>
+    <br><br>
+    <div style="display:flex; flex-wrap:wrap">
+      {{ for member in committee_list: }}
+      <div style="width:50%; text-align:center; padding-top:30px">
+        <b>
+          {{ =member.faculty.name.upper() }}{{ if member.faculty.title: }}{{ =f', {member.faculty.title}' }}{{ pass }}
+        </b>
+        <br>{{ =member.faculty.position }}, {{ =member.committee.position }}
+      </div>
+      {{ pass }}
+    </div>
+    <div style="padding-top:20px; width:25%; margin:auto">
+      <p>Noted:</p>
+      <div style="padding-top:30px; text-align:center;">
+        <b>
+          {{ =attestor.name.upper() }}{{ if attestor.title: }}{{ =f', {attestor.title}' }}{{ pass }}
+        </b>
+        <br>{{ =attestor.position }}
+      </div>
+    </div>
+  </div>
+
+  <br>
+  <div style="background-color: white; margin-top:3px;  width: 225px; border: 1px solid black; height:280px; float: left; margin-right:12px;">
+  </div>
+  <div style="letter-spacing:0.5px;"><br><br>
+    <b>Official Marks:</b>	<br>
+    1.0 -- 99 - 100%;  1.1 -- 98%;   1.2 -- 97%;  1.3 -- 96%;  1.4 -- 95% (Outstanding);   1.5 -- 94%;<br>
+    1.6 -- 93%;  1.7--92% (Superior);  1.8 -- 91%;  1.9 -- 90%;  2.0 -- 89%;  2.1 -- 88%;  2.2 -- 87%;<br>
+    2.3 -- 86%; 2.4 -- 85% (Very Satisfactory); 2.5--84%; 2.6 -- 82-83%; 2.7 -- 80-81% (Satisfactory);<br>
+    2.8 -- 78-79%:  2.9 -- 76-77%;  3.0 -- 75% (Fair);  5.0 -- Failed; INC.--Incomplete.<br><br>
+
+    <b>NOTE:</b><br>
+    This grading system took effect during school year 2001-2002.<br>
+    &nbsp;&nbsp;&nbsp;<span style="color:red">#REF!</span>	<br>
+    in this office and is considered as original copy when it bears the seal of the University  and
+    the original signature in ink of the University Registrar or her duly authorized representative.
+    Any erasure or alteration made on this copy renders the whole transcript invalid.
+
+    <br><br><br>
+    Remarks:_____________________________________<br>
+    &nbsp;&nbsp;&nbsp;#REF <br><br>
+  </div>
+
+  <div style="display:flex; justify-content:space-between" class="avoid-break">
+   <div style="width:30%">
+     <div style="text-align:center;">
+       <span style="color:red"><b>
+         #REF!
+       </b>
+       <br>#REF!</span>
+     </div>
+     <p>Date Issued:</p>
+     <br>
+     <p>____________________________</p>
+   </div>
+   <div style="width:30%">
+     <p>Reviewed by:</p>
+     <div style="padding-top:30px; text-align:center;">
+       <b>
+         {{ =reviewer.name.upper() }}{{ if reviewer.title: }}{{ =f', {reviewer.title}' }}{{ pass }}
+       </b>
+       <br>{{ =reviewer.position }}
+     </div>
+   </div>
+   <div style="width:30%; padding-top:30px;">
+     <p>Certified correct:</p>
+     <div style="padding-top:30px; text-align:center;">
+       <b>
+         {{ =registrar.name.upper() }}{{ if registrar.title: }}{{ =f', {registrar.title}' }}{{ pass }}
+       </b>
+       <br>{{ =registrar.position }}
+     </div>
+   </div>
+ </div>
+</body>
+<footer>
+  <div style="display:flex; justify-content:space-between;">
+    <div>
+      <p style="font-size:22px; font-weight:bold;">F-</p>
+      <p style="font-size:11px;color:grey">BU-F-UREG-14</p>
+      <p style="font-size:11px;color:grey">Effectivity Date: Mar. 9, 2011</p>
+    </div>
+    <div style="align-self:center">
+      <p style="font-size:11px;text-align:right">Revision: {{ =transcript.revision }}</p>
+    </div>
+  </div>
+</footer>
+</html>
+
+<script>
+    class Header extends HTMLElement {
+  constructor() {
+    super();
+  }
+
+  connectedCallback() {
+    this.innerHTML = `
+      <style>
+
+      </style>
+
+      <div style="text-align:center;">
+        <p>Bicol University<p>
+            <p style="font-weight:bold">{{ =college.name }}</p>
+            <p>{{ =college.address }}</p>
+            <br/>
+              <p style="font-weight:bold">OFFICIAL TRANSCRIPT OF RECORD</p>
+      </div>
+      <div class="col-container">
+        <div class="col" style="width:50%;">
+          <p style="font-weight:bold">ENTRANCE DATA</p>
+          <br/>
+          <dl>
+            <dt style="width:45%">Date graduated/Last attended:</dt>
+            <dd style="width:45%">{{ =student.last_attended }}</dd><br>
+            <dt style="width:45%">Category:</dt>
+            <dd style="width:45%">{{ =student.category }}</dd><br>
+            <dt style="width:45%">High school/College:</dt>
+            <dd style="width:45%">{{ =college.name }}</dd><br>
+            <dt style="width:45%">Date/Semester admitted:</dt>
+            <dd style="width:45%">{{ =student.sem_admitted }}</dd>
+          </dl>
+        </div>
+
+        <div class="col" style="width:50%;">
+          <dl>
+            <dt>Name:</dt>
+            <dd style="font-weight:bold">{{ =f'{student.last_name}, {student.first_name} {student.middle_name}'.upper() }}</dd><br>
+            <dt>Address:</dt>
+            <dd>{{ =student.address }}</dd><br>
+            <dt>Date of Birth:</dt>
+            <dd>{{ =student.birthdate.strftime("%B %-d, %Y") }}</dd><br>
+            <dt>Place of Birth:</dt>
+            <dd>{{ =student.birthplace }}</dd><br>
+            <dt>Degree/Title/Course:</dt>
+            <dd>{{ =program.name }}</dd><br>
+            <dt>Major/Specialization:</dt>
+            <dd>
+              {{ if specialization: }}
+              {{  =specialization.name }}
+              {{ else: }}<br/>{{ pass }}
+            </dd><br>
+            <dt>Date Conferred:</dt>
+            <dd>
+              {{ if transcript.date_conferred: }}{{ =transcript.date_conferred.strftime("%B %-d, %Y") }}{{ pass }}
+              <br>
+              per BOR Referendum No. {{ =transcript.ref_no }}, s. {{ =transcript.series }}
+            </dd>
+          </dl>
+        </div>
+      </div>
+
+    `;
+  }
+
+
+}
+customElements.define('header-component', Header);
+</script>
