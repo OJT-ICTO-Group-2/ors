@@ -21,8 +21,7 @@ def get_tor_file():
     program = db(db.program.id == student.program_id).select().first()
 
     if student.specialization_id:
-        specialization = db(db.specialization.id ==
-                            student.specialization_id).select().first()
+        specialization = db(db.specialization.id == student.specialization_id).select().first()
     else:
         specialization = None
 

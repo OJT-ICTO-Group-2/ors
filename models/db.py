@@ -32,13 +32,19 @@ if not request.env.web2py_runtime_gae:
     # if NOT running on Google App Engine use SQLite or other DB
     # ---------------------------------------------------------------------
     db = DAL('postgres://anjelo:admin@localhost:5432/ors1')
+    db.define_table('faculty',
+                    Field("name", type='string', length=150, notnull=True),
+                    Field("position", type="string", length=80, notnull=True),
+                    Field("title", type='string', length=15))
     db.define_table('college',
                     Field("name", type='string', length=80, notnull=True, unique=True),
                     Field("abbreviation", type='string', length=8, notnull=True, unique=True),
-                    Field("address", type='string', length=50, notnull=True))
+                    Field("address", type='string', length=50, notnull=True),
+                    Field("dean",'reference faculty'))
     db.define_table('program',
                     Field("name", type='string', length=50, notnull=True, unique=True),
-                    Field("abbreviation", type='string', length=10, notnull=True, unique=True))
+                    Field("abbreviation", type='string', length=10, notnull=True, unique=True),
+                    Field("ladderized", type='boolean', notnull=True, default=False))
     db.define_table('specialization',
                     Field("name", type='string', length=50, notnull=True, unique=True),
                     Field("program_id", 'reference program', notnull=True))
@@ -56,11 +62,20 @@ if not request.env.web2py_runtime_gae:
                     Field("category", type='string', length=20, notnull=True),
                     Field("college_id", 'reference college', notnull=True),
                     Field("sem_admitted", type='string', length=25, notnull=True),
-                    Field("date_graduated", type='date'))
+                    Field("date_graduated", type='date'),
+                    Field("class_year", type='string', length=9))
     db.define_table('course',
                     Field("code", type='string', length=15, notnull=True, unique=True),
                     Field("title", type='string', length=80, notnull=True),
                     Field("units", type='integer', notnull=True))
+    db.define_table('rle_course',
+                    Field("code_subject", type='string', length=15, notnull=True),
+                    Field("code_digit", type='string', length=15, notnull=True),
+                    Field("title", type='string', length=80, notnull=True),
+                    Field("lecture_total", type='integer', notnull=True),
+                    Field("lecture_units", type='integer', notnull=True),
+                    Field("rle_hours", type='integer', notnull=True),
+                    Field("rle_units", type='integer', notnull=True))
     db.define_table('grade',
                     Field("student_id", 'reference student', notnull=True),
                     Field("course_id", 'reference course', notnull=True),
@@ -73,17 +88,13 @@ if not request.env.web2py_runtime_gae:
                     Field("name", type='string', length=150, notnull=True),
                     Field("position", type="string", length=80, notnull=True),
                     Field("title", type='string', length=15))
-    db.define_table('faculty',
-                    Field("name", type='string', length=150, notnull=True),
-                    Field("position", type="string", length=80, notnull=True),
-                    Field("title", type='string', length=15))
     db.define_table('transcript',
                     Field("student_id", 'reference student', notnull=True),
                     Field("attestor_id", 'reference faculty', notnull=True),
                     Field("reviewer_id", 'reference faculty', notnull=True),
                     Field("registrar_id", 'reference staff', notnull=True),
                     Field("remarks", type='string', length=50),
-                    Field("revision", type='integer', notnull=True),
+                    Field("revision", type='integer', notnull=True, default=0),
                     Field("date_conferred", type='date'),
                     Field("ref_no", type='string', length=8),
                     Field("series", type='integer'))
@@ -91,6 +102,19 @@ if not request.env.web2py_runtime_gae:
                     Field("faculty_id", 'reference faculty', notnull=True),
                     Field("transcript_id", 'reference transcript', notnull=True),
                     Field("position", type="string", length=80, notnull=True))
+    db.define_table('community_resource',
+                    Field("name", type='string', notnull=True),
+                    Field("type", type='integer', notnull=True),
+                    Field("families_total", type='integer'),
+                    Field("patients_daily_ave", type='integer'))
+    db.define_table('attended_community_resource',
+                    Field("student_id", 'reference student', notnull=True),
+                    Field("community_resource_id", 'reference community_resource', notnull=True),
+                    Field("year_level", type='string', length=6, notnull=True))
+    db.define_table('rle_record',
+                    Field("registrar_id", 'reference staff', notnull=True),
+                    Field("revision", type='integer', notnull=True, default=0))
+
 
     # with open('/home/www-data/web2py/applications/ORS/static/sample_data/colleges.csv', 'r', newline='') as csv_file:
     #     file = csv.reader(csv_file)
