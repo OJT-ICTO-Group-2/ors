@@ -260,6 +260,12 @@ def tor_view():
 
     return locals()
 
+def get_rle_record_file():
+    pass
+
+def rle_record_view():
+    pass
+
 
 # ---- example index page ----
 def index():

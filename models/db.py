@@ -6,8 +6,6 @@
 # -------------------------------------------------------------------------
 from gluon.contrib.appconfig import AppConfig
 from gluon.tools import Auth
-import csv
-
 # -------------------------------------------------------------------------
 # This scaffolding model makes your app work on Google App Engine too
 # File is released under public domain and you can use without limitations
@@ -31,7 +29,8 @@ if not request.env.web2py_runtime_gae:
     # ---------------------------------------------------------------------
     # if NOT running on Google App Engine use SQLite or other DB
     # ---------------------------------------------------------------------
-    db = DAL('postgres://anjelo:admin@localhost:5432/ors1')
+    from db_creds import db_connection
+    db = DAL(db_connection)
     db.define_table('faculty',
                     Field("name", type='string', length=150, notnull=True),
                     Field("position", type="string", length=80, notnull=True),
