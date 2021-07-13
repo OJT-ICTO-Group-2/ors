@@ -39,7 +39,8 @@ if not request.env.web2py_runtime_gae:
                     Field("name", type='string', length=80, notnull=True, unique=True),
                     Field("abbreviation", type='string', length=8, notnull=True, unique=True),
                     Field("address", type='string', length=50, notnull=True),
-                    Field("dean",'reference faculty'))
+                    Field("dean",'reference faculty'),
+                    Field("contact_number", type='string', length=15))
     db.define_table('program',
                     Field("name", type='string', length=50, notnull=True, unique=True),
                     Field("abbreviation", type='string', length=10, notnull=True, unique=True),
@@ -114,6 +115,12 @@ if not request.env.web2py_runtime_gae:
     db.define_table('rle_record',
                     Field("student_id", 'reference student', notnull=True),
                     Field("registrar_id", 'reference staff', notnull=True),
+                    Field("revision", type='integer', notnull=True, default=0))
+    db.define_table('grades_certificate',
+                    Field("student_id", 'reference student', notnull=True),
+                    Field("date_issued", type='date', notnull=True),
+                    Field("registrar", 'reference staff', notnull=True),
+                    Field("noted_by", 'reference staff', notnull=True),
                     Field("revision", type='integer', notnull=True, default=0))
 
 
