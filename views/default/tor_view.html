@@ -110,7 +110,56 @@
 	<title>{{ =f'{student.last_name}, {student.first_name} {student.middle_name}' }} | Transcript of Record</title>
 </head>
 <body>
-  <header-component></header-component>
+  <div style="text-align:center;">
+    <p>Bicol University</p>
+    <p style="font-weight:bold">{{ =college.name }}</p>
+    <p>{{ =college.address }}</p>
+    <br/>
+    <p style="font-weight:bold">OFFICIAL TRANSCRIPT OF RECORD</p>
+  </div>
+  <div class="col-container">
+    <div class="col" style="width:50%;">
+      <p style="font-weight:bold">ENTRANCE DATA</p>
+      <br/>
+      <dl>
+        <dt style="width:45%">Date graduated/Last attended:</dt>
+        <dd style="width:45%">{{ =student.last_attended }}</dd><br>
+        <dt style="width:45%">Category:</dt>
+        <dd style="width:45%">{{ =student.category }}</dd><br>
+        <dt style="width:45%">High school/College:</dt>
+        <dd style="width:45%">{{ =college.name }}</dd><br>
+        <dt style="width:45%">Date/Semester admitted:</dt>
+        <dd style="width:45%">{{ =student.sem_admitted }}</dd>
+      </dl>
+    </div>
+
+    <div class="col" style="width:50%;">
+      <dl>
+        <dt>Name:</dt>
+        <dd style="font-weight:bold">{{ =f'{student.last_name}, {student.first_name} {student.middle_name}'.upper() }}</dd><br>
+        <dt>Address:</dt>
+        <dd>{{ =student.address }}</dd><br>
+        <dt>Date of Birth:</dt>
+        <dd>{{ =student.birthdate.strftime("%B %-d, %Y") }}</dd><br>
+        <dt>Place of Birth:</dt>
+        <dd>{{ =student.birthplace }}</dd><br>
+        <dt>Degree/Title/Course:</dt>
+        <dd>{{ =program.name }}</dd><br>
+        <dt>Major/Specialization:</dt>
+        <dd>
+          {{ if specialization: }}
+          {{  =specialization.name }}
+          {{ else: }}<br/>{{ pass }}
+        </dd><br>
+        <dt>Date Conferred:</dt>
+        <dd>
+          {{ if transcript.date_conferred: }}{{ =transcript.date_conferred.strftime("%B %-d, %Y") }}{{ pass }}
+          <br>
+          per BOR Referendum No. {{ =transcript.ref_no }}, s. {{ =transcript.series }}
+        </dd>
+      </dl>
+    </div>
+  </div>
 	<table>
 		<thead>
 			<tr>
@@ -315,74 +364,3 @@
   </div>
 </footer>
 </html>
-
-<script>
-    class Header extends HTMLElement {
-  constructor() {
-    super();
-  }
-
-  connectedCallback() {
-    this.innerHTML = `
-      <style>
-
-      </style>
-
-      <div style="text-align:center;">
-        <p>Bicol University<p>
-            <p style="font-weight:bold">{{ =college.name }}</p>
-            <p>{{ =college.address }}</p>
-            <br/>
-              <p style="font-weight:bold">OFFICIAL TRANSCRIPT OF RECORD</p>
-      </div>
-      <div class="col-container">
-        <div class="col" style="width:50%;">
-          <p style="font-weight:bold">ENTRANCE DATA</p>
-          <br/>
-          <dl>
-            <dt style="width:45%">Date graduated/Last attended:</dt>
-            <dd style="width:45%">{{ =student.last_attended }}</dd><br>
-            <dt style="width:45%">Category:</dt>
-            <dd style="width:45%">{{ =student.category }}</dd><br>
-            <dt style="width:45%">High school/College:</dt>
-            <dd style="width:45%">{{ =college.name }}</dd><br>
-            <dt style="width:45%">Date/Semester admitted:</dt>
-            <dd style="width:45%">{{ =student.sem_admitted }}</dd>
-          </dl>
-        </div>
-
-        <div class="col" style="width:50%;">
-          <dl>
-            <dt>Name:</dt>
-            <dd style="font-weight:bold">{{ =f'{student.last_name}, {student.first_name} {student.middle_name}'.upper() }}</dd><br>
-            <dt>Address:</dt>
-            <dd>{{ =student.address }}</dd><br>
-            <dt>Date of Birth:</dt>
-            <dd>{{ =student.birthdate.strftime("%B %-d, %Y") }}</dd><br>
-            <dt>Place of Birth:</dt>
-            <dd>{{ =student.birthplace }}</dd><br>
-            <dt>Degree/Title/Course:</dt>
-            <dd>{{ =program.name }}</dd><br>
-            <dt>Major/Specialization:</dt>
-            <dd>
-              {{ if specialization: }}
-              {{  =specialization.name }}
-              {{ else: }}<br/>{{ pass }}
-            </dd><br>
-            <dt>Date Conferred:</dt>
-            <dd>
-              {{ if transcript.date_conferred: }}{{ =transcript.date_conferred.strftime("%B %-d, %Y") }}{{ pass }}
-              <br>
-              per BOR Referendum No. {{ =transcript.ref_no }}, s. {{ =transcript.series }}
-            </dd>
-          </dl>
-        </div>
-      </div>
-
-    `;
-  }
-
-
-}
-customElements.define('header-component', Header);
-</script>

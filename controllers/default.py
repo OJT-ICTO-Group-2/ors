@@ -13,7 +13,6 @@ def get_tor_file():
     student_id = request.args(0)
     if not student_id:
         raise HTTP(400, "Bad request")
-        return
 
     # get data of student from database
     student = db(db.student.student_id == student_id).select().first()
@@ -231,12 +230,10 @@ def tor_view():
         summary["equivalent"] += term_data[term]["equivalent"]
 
     summary["equivalent"] = round(summary["equivalent"], 1)
-    summary["GWA"] = round(summary["equivalent"] /
-                           summary["units"], 4)     # calculate for GWA
+    summary["GWA"] = round(summary["equivalent"] / summary["units"], 4)     # calculate for GWA
 
     transcript = db(db.transcript.student_id == student.id).select().first()
-    committee = db(db.committee.transcript_id == transcript.id).select(
-        join=db.faculty.on(db.committee.faculty_id == db.faculty.id))
+    committee = db(db.committee.transcript_id == transcript.id).select(join=db.faculty.on(db.committee.faculty_id == db.faculty.id))
 
     committee_list = []
 
@@ -264,7 +261,28 @@ def get_rle_record_file():
     pass
 
 def rle_record_view():
-    pass
+    student_id = request.args(0)
+    if not student_id:
+        raise HTTP(400, "Bad request")
+
+    # get data of student from database
+    student = db(db.student.student_id == student_id).select().first()
+    rle_courses = db().select(db.rle_course.ALL)
+    attended_cr = db(db.attended_community_resource.student_id == student.id).select()
+    rle_record = db(db.rle_record.student_id == student.id).select()
+
+    terms = {1, 2, 3, 4}
+
+    term_courses = {}
+
+    for term in terms:
+        term_courses[term] = []
+        for course in rle_courses:
+            if course.year_level == term:
+                term_courses[term].append(course)
+
+
+    return locals()
 
 
 # ---- example index page ----

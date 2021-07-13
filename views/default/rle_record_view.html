@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="{{=URL('static','css/style.css')}}"/>
+    <title>{{ =f'{student.last_name}, {student.first_name} {student.middle_name}' }} | RLE Record</title>
+  </head>
+  <body>
+    <header>
+      <div class="text-center">
+        <h2>COLLEGE OF NURSING</h2>
+        <p>Legazpi City</p>
+        <br>
+        <h1>RECORD OF RELATED LEARNING EXPERIENCE</h1>
+        <h3>Bachelor of Science in Nursing</h3>
+        <p>Ladderized Curriculum</p>
+      </div>
+    </header>
+    <div class="flex-space-between row">
+      <div>
+          <span class="text-bold">NAME:</span>
+          <span>{{ =f'{student.last_name}, {student.first_name} {student.middle_name}'.upper() }}</span>
+      </div>
+      <div>
+          <span class="text-bold">CLASS:</span>
+          <span>{{ =student.class_year }}</span>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th class="text-small" colspan="2">Lecture</th>
+          <th class="text-small" colspan="2">Releated Learning Exp.</th>
+        </tr>
+        <tr>
+          <th colspan="5"></th>
+          <th class="u last-col">Total</th>
+          <th class="u last-col">Units</th>
+          <th class="u last-col">Hours</th>
+          <th class="u last-col">Units</th>
+        </tr>
+      </thead>
+      <tbody class="text-small">
+        {{ for term in terms: }}  <!-- loop over the terms -->
+        <tr>
+          <td style="vertical-align: top;" rowspan="{{ =len(term_courses[term]) }}">Ladder {{ =term }}</td>
+          {{ for course in term_courses[term]: }} <!-- loop over courses per term -->
+          <td>{{ =course.code_subject }}</td>
+          <td>{{ =course.code_digit }}</td>
+          <td>-</td>
+          <td>{{ =course.title }}</td>
+          <td class="text-center">{{ =course.lecture_total }}</td>
+          <td class="text-center">{{ =course.lecture_units }}</td>
+          <td class="text-center">{{ =course.rle_hours }}</td>
+          <td class="text-center">{{ =course.rle_units }}</td>
+        </tr>
+        {{ pass }}
+        {{ pass }}
+        <tr class="text-bold text-center">
+          <td colspan="5" class="text-right">TOTAL</td>
+          <td class="double-underline">100</td>
+          <td class="double-underline">51</td>
+          <td class="double-underline">2,499 hrs.</td>
+          <td class="double-underline">49</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="mt-3">
+      <h3>COMMUNITY RESOURCES</h3>
+      <table class="pl-5">
+        <thead>
+          <tr class="text-bold">
+            <th class="text-left">1. BARANGAY/MUNICIPALITIES</th>
+            <th>No. of Families</th>
+            <th>Year Level</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="pl-5">Arimbay Health Center</td>
+            <td class="text-center">700</td>
+            <td class="text-center">II-III</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mt-3">
+      <span>Date completed: </span>
+      <div class="flex-end mt-2">
+        <div class="text-center">
+          <p class="text-bold">Emerlinda E. Alcala, Ed.D.</p>
+          <p>Dean</p>
+        </div>
+      </div>
+      <div style="width: 40%" class="mt-2 pl-5">
+        <p>Noted:</p>
+        <p class="text-center text-bold">Emerlinda E. Alcala, Ed.D.</p>
+        <p class="text-center">Dean</p>
+      </div>
+    </div>
+
+    <footer class="mt-3">
+      <div class="flex-space-between text-bold text-xs">
+        <div>
+          <p>BU-F-UREG-57</p>
+          <p>Effectivity Date: August 2, 2010</p>
+        </div>
+        <div>
+          <p>Revision: 0</p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
