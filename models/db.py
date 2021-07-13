@@ -50,6 +50,7 @@ if not request.env.web2py_runtime_gae:
                     Field("program_id", 'reference program', notnull=True))
     db.define_table('student',
                     Field("student_id", type='string', length=18, notnull=True, unique=True),
+                    Field("gender", type='string', length=15),
                     Field("first_name", type='string', length=50, notnull=True),
                     Field("middle_name", type='string', length=50),
                     Field("last_name", type='string', length=50, notnull=True),
