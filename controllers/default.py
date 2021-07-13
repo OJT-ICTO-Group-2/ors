@@ -269,18 +269,30 @@ def rle_record_view():
     student = db(db.student.student_id == student_id).select().first()
     rle_courses = db().select(db.rle_course.ALL)
     attended_cr = db(db.attended_community_resource.student_id == student.id).select()
-    rle_record = db(db.rle_record.student_id == student.id).select()
+    rle_record = db(db.rle_record.student_id == student.id).select().first()
 
     terms = {1, 2, 3, 4}
 
     term_courses = {}
+
+    total = {"lecture_total": 0, "lecture_units": 0, "rle_hours": 0, "rle_units": 0}
 
     for term in terms:
         term_courses[term] = []
         for course in rle_courses:
             if course.year_level == term:
                 term_courses[term].append(course)
+                total["lecture_total"] += course.lecture_total
+                total["lecture_units"] += course.lecture_units
+                total["rle_hours"] += course.rle_hours
+                total["rle_units"] += course.rle_units
 
+    attended_cr_dict = {1: [], 2: []}
+    for cr in attended_cr:
+        if cr.community_resource_id.type == 1:
+            attended_cr_dict[1].append(cr)
+        elif cr.community_resource_id.type == 2:
+            attended_cr_dict[2].append(cr)
 
     return locals()
 
