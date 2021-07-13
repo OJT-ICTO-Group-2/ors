@@ -68,8 +68,9 @@ if not request.env.web2py_runtime_gae:
                     Field("title", type='string', length=80, notnull=True),
                     Field("units", type='integer', notnull=True))
     db.define_table('rle_course',
-                    Field("code_subject", type='string', length=15, notnull=True),
-                    Field("code_digit", type='string', length=15, notnull=True),
+                    Field("year_level", type='integer', notnull=True),
+                    Field("code_subject", type='string', length=10, notnull=True),
+                    Field("code_digit", type='integer', notnull=True),
                     Field("title", type='string', length=80, notnull=True),
                     Field("lecture_total", type='integer', notnull=True),
                     Field("lecture_units", type='integer', notnull=True),
@@ -111,6 +112,7 @@ if not request.env.web2py_runtime_gae:
                     Field("community_resource_id", 'reference community_resource', notnull=True),
                     Field("year_level", type='string', length=6, notnull=True))
     db.define_table('rle_record',
+                    Field("student_id", 'reference student', notnull=True),
                     Field("registrar_id", 'reference staff', notnull=True),
                     Field("revision", type='integer', notnull=True, default=0))
 
