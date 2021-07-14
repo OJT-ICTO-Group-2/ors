@@ -50,7 +50,6 @@ if not request.env.web2py_runtime_gae:
                     Field("program_id", 'reference program', notnull=True))
     db.define_table('student',
                     Field("student_id", type='string', length=18, notnull=True, unique=True),
-                    Field("gender", type='string', length=15),
                     Field("first_name", type='string', length=50, notnull=True),
                     Field("middle_name", type='string', length=50),
                     Field("last_name", type='string', length=50, notnull=True),
@@ -123,6 +122,17 @@ if not request.env.web2py_runtime_gae:
                     Field("registrar", 'reference staff', notnull=True),
                     Field("noted_by", 'reference staff', notnull=True),
                     Field("revision", type='integer', notnull=True, default=0))
+    db.define_table('enrollment_certificate',
+                    Field("college_id", 'reference college'),
+                    Field("gender", type='string', length=4),
+                    Field("student_id", 'reference student'),
+                    Field("program_id", 'reference program'),
+                    Field("specialization_id", 'reference specialization'),
+                    Field("year_level", type='string', length=3),
+                    Field("current_term", type='string', length=50),
+                    Field("date_issued", type='date'),
+                    Field("staff_name", 'reference staff'),
+                    Field("revision_num", type='integer', default=0))
 
 
     # with open('/home/www-data/web2py/applications/ORS/static/sample_data/colleges.csv', 'r', newline='') as csv_file:
