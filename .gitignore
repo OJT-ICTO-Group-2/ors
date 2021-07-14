@@ -35,3 +35,4 @@ pip-log.txt
 .mr.developer.cfg
 
 modules/db_creds.py
+**/.~*
