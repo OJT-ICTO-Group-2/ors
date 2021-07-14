@@ -491,3 +491,24 @@ def rle_record_view():
             attended_cr_dict[2].append(cr)
 
     return locals()
+
+#displaying page 10
+def page_ten():
+    student_id = request.args(0)
+    if not student_id:
+        raise HTTP(400, "Bad request")
+        return
+
+    #  get data of student from database
+    student = db(db.student.student_id == student_id).select().first()
+    college = db(db.college.id == student.college_id).select().first()
+    program = db(db.program.id == student.program_id).select().first()
+
+    if student.specialization_id:
+        specialization = db(db.specialization.id == student.specialization_id).select().first()
+    else:
+        specialization = None
+
+    staff = db(db.staff.id).select().first()     
+    
+    return locals()
