@@ -63,7 +63,7 @@ def get_tor_file():
     file_name = f'{student.last_name}-{student.first_name}-{student.middle_name}-TOR.xlsx'.replace(" ", "_")
 
     # load template file
-    wb = opx.load_workbook(filename='applications/ors/static/tor/TOR-template.xlsx')
+    wb = opx.load_workbook(filename='applications/ors/static/templates/TOR-template.xlsx')
 
     # get current worksheet
     ws = wb.active
@@ -177,7 +177,7 @@ def get_tor_file():
 
     ws[f'B{page_count * 66 + 121}'] = transcript.remarks
 
-    file = f'applications/ors/static/tor/{file_name}'
+    file = f'applications/ors/documents/tor/{file_name}'
     wb.save(filename=file)
 
     from gluon.contenttype import contenttype
@@ -297,7 +297,7 @@ def get_rle_record_file():
     file_name = f'{student.last_name}-{student.first_name}-{student.middle_name}-TOR.xlsx'.replace(" ", "_")
 
     # load template file
-    wb = opx.load_workbook(filename='applications/ors/static/rle-record/RLE-Record-Template.xlsx')
+    wb = opx.load_workbook(filename='applications/ors/static/templates/RLE-Record-Template.xlsx')
 
     # get current worksheet
     ws = wb.active
@@ -358,49 +358,103 @@ def get_rle_record_file():
 
     row_counter += 1
 
-    # for category in range(1, 3):
-
-
-    if attended_cr_dict[1]:
-        ws.merge_cells(f'B{row_counter}:G{row_counter}')
-        ws[f'B{row_counter}'] = "1. BARANGAY/MUNICIPALITIES"
-        ws[f'B{row_counter}'].font = opx.styles.Font(name="Times New Roman", size=10, bold=True)
-
-        ws.merge_cells(f'H{row_counter}:I{row_counter}')
-        ws[f'H{row_counter}'] = "No. of Families"
-        ws[f'H{row_counter}'].font = opx.styles.Font(name="Times New Roman", size=10, bold=True)
-        ws[f'H{row_counter}'].alignment = opx.styles.Alignment(horizontal="center")
-
-        ws.merge_cells(f'J{row_counter}:K{row_counter}')
-        ws[f'J{row_counter}'] = "Year Level"
-        ws[f'J{row_counter}'].font = opx.styles.Font(name="Times New Roman", size=10, bold=True)
-        ws[f'J{row_counter}'].alignment = opx.styles.Alignment(horizontal="center")
-
-        row_counter += 1
-
-        for cr in attended_cr_dict[1]:
-            ws.merge_cells(f'C{row_counter}:G{row_counter}')
-            ws[f'C{row_counter}'] = cr.community_resource_id.name
+    for category in range(1, 3):
+        if attended_cr_dict[category]:
+            ws.merge_cells(f'B{row_counter}:G{row_counter}')
+            if category == 1:
+                ws[f'B{row_counter}'] = "1. BARANGAY/MUNICIPALITIES"
+            elif category == 2 and attended_cr_dict[1]:
+                ws[f'B{row_counter}'] = "2. HOSPITALS/CLINICS"
+            elif category == 2 and not attended_cr_dict[1]:
+                ws[f'B{row_counter}'] = "1. HOSPITALS/CLINICS"
+            ws[f'B{row_counter}'].font = opx.styles.Font(name="Times New Roman", size=10, bold=True)
 
             ws.merge_cells(f'H{row_counter}:I{row_counter}')
-            ws[f'H{row_counter}'] = f'{cr.community_resource_id.families_total:,}'
+            if category == 1:
+                ws[f'H{row_counter}'] = "No. of Families"
+            elif category == 2 and attended_cr_dict[1]:
+                ws[f'H{row_counter}'] = "Daily Average Patient"
+            ws[f'H{row_counter}'].font = opx.styles.Font(name="Times New Roman", size=10, bold=True)
             ws[f'H{row_counter}'].alignment = opx.styles.Alignment(horizontal="center")
 
             ws.merge_cells(f'J{row_counter}:K{row_counter}')
-            ws[f'J{row_counter}'] = cr.year_level
+            ws[f'J{row_counter}'] = "Year Level"
+            ws[f'J{row_counter}'].font = opx.styles.Font(name="Times New Roman", size=10, bold=True)
             ws[f'J{row_counter}'].alignment = opx.styles.Alignment(horizontal="center")
-
-            for row in ws.iter_cols(min_row=row_counter, min_col=3, max_row=row_counter, max_col=11):
-                for cell in row:
-                    cell.font = opx.styles.Font(name="Times New Roman", size=10)
 
             row_counter += 1
 
+            for cr in attended_cr_dict[category]:
+                ws.merge_cells(f'C{row_counter}:G{row_counter}')
+                ws[f'C{row_counter}'] = cr.community_resource_id.name
+                ws[f'C{row_counter}'].alignment = opx.styles.Alignment(wrap_text=True)
+                if len(cr.community_resource_id.name) > 57:
+                    ws.row_dimensions[row_counter].height = 28
+
+                ws.merge_cells(f'H{row_counter}:I{row_counter}')
+                ws[f'H{row_counter}'].alignment = opx.styles.Alignment(horizontal="center")
+                if category == 1:
+                    ws[f'H{row_counter}'] = f'{cr.community_resource_id.families_total:,}'
+                elif category == 2:
+                    ws[f'H{row_counter}'] = f'{cr.community_resource_id.patients_daily_ave:,}'
+
+                ws.merge_cells(f'J{row_counter}:K{row_counter}')
+                ws[f'J{row_counter}'] = cr.year_level
+                ws[f'J{row_counter}'].alignment = opx.styles.Alignment(horizontal="center")
+
+                for row in ws.iter_cols(min_row=row_counter, min_col=3, max_row=row_counter, max_col=11):
+                    for cell in row:
+                        cell.font = opx.styles.Font(name="Times New Roman", size=10)
+
+                row_counter += 1
+
+    row_counter += 1
+    ws.merge_cells(f'A{row_counter}:B{row_counter}')
+    ws[f'A{row_counter}'] = "Date Completed: "
+    ws[f'A{row_counter}'].font = opx.styles.Font(name="Times New Roman", bold=True)
+
+    ws[f'C{row_counter}'] = student.date_graduated.strftime("%B %-d, %Y")
+    ws[f'C{row_counter}'].font = opx.styles.Font(name="Times New Roman")
+
+    row_counter += 3
+    ws.merge_cells(f'G{row_counter}:K{row_counter}')
+    ws[f'G{row_counter}'] = f'{student.college_id.dean.name.upper()}{f", {student.college_id.dean.title}" if student.college_id.dean.title else ""}'
+    ws[f'G{row_counter}'].font = opx.styles.Font(name="Times New Roman", bold=True)
+    ws[f'G{row_counter}'].alignment = opx.styles.Alignment(horizontal="center")
+
+    row_counter+=1
+    ws.merge_cells(f'G{row_counter}:K{row_counter}')
+    ws[f'G{row_counter}'] = "Dean"
+    ws[f'G{row_counter}'].font = opx.styles.Font(name="Times New Roman")
+    ws[f'G{row_counter}'].alignment = opx.styles.Alignment(horizontal="center")
+
+    row_counter += 2
+    ws[f'B{row_counter}'] = "Noted:"
+    ws[f'B{row_counter}'].font = opx.styles.Font(name="Times New Roman")
+
+    row_counter += 2
+    ws.merge_cells(f'B{row_counter}:F{row_counter}')
+    ws[f'B{row_counter}'] = f'{rle_record.registrar_id.name.upper()}{f", {rle_record.registrar_id.title}" if rle_record.registrar_id.title else ""}'
+    ws[f'B{row_counter}'].font = opx.styles.Font(name="Times New Roman", bold=True)
+    ws[f'B{row_counter}'].alignment = opx.styles.Alignment(horizontal="center")
+
+    row_counter += 1
+    ws.merge_cells(f'B{row_counter}:F{row_counter}')
+    ws[f'B{row_counter}'] = f'{rle_record.registrar_id.position}'
+    ws[f'B{row_counter}'].font = opx.styles.Font(name="Times New Roman")
+    ws[f'B{row_counter}'].alignment = opx.styles.Alignment(horizontal="center")
+
+    ws['J58'] = f'Revision: {rle_record.revision}'
 
 
-    file = f'applications/ors/static/rle-record/{file_name}'
+
+    file = f'applications/ors/documents/rle-record/{file_name}'
     wb.save(filename=file)
 
+    from gluon.contenttype import contenttype
+    response.headers['Content-Type'] = contenttype('xlsx')
+    response.headers['Content-disposition'] = f'attachment; filename={file_name}'
+    response.stream(file)
 
 
 def rle_record_view():
