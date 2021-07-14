@@ -124,11 +124,10 @@ if not request.env.web2py_runtime_gae:
                     Field("noted_by", 'reference staff', notnull=True),
                     Field("revision", type='integer', notnull=True, default=0))
     db.define_table('enrollment_certificate',
-                    Field("student_id", 'reference student'),
-                    Field("term", type='string', length=50),
-                    Field("date_issued", type='date'),
-                    Field("registrar", 'reference staff'),
-                    Field("revision", type='integer', default=0),
+                    Field("student_id", 'reference student', notnull=True),
+                    Field("date_issued", type='date', notnull=True),
+                    Field("registrar", 'reference staff', notnull=True),
+                    Field("revision", type='integer', default=0, notnull=True),
                     Field("term_sem", type="string", length=15, notnull=True),
                     Field("term_year", type="text", length=10, notnull=True))
 
