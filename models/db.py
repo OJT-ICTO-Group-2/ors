@@ -63,7 +63,8 @@ if not request.env.web2py_runtime_gae:
                     Field("college_id", 'reference college', notnull=True),
                     Field("sem_admitted", type='string', length=25, notnull=True),
                     Field("date_graduated", type='date'),
-                    Field("class_year", type='string', length=9))
+                    Field("class_year", type='string', length=9),
+                    Field("gender", type='string', length=10))
     db.define_table('course',
                     Field("code", type='string', length=15, notnull=True, unique=True),
                     Field("title", type='string', length=80, notnull=True),
@@ -123,16 +124,13 @@ if not request.env.web2py_runtime_gae:
                     Field("noted_by", 'reference staff', notnull=True),
                     Field("revision", type='integer', notnull=True, default=0))
     db.define_table('enrollment_certificate',
-                    Field("college_id", 'reference college'),
-                    Field("gender", type='string', length=4),
                     Field("student_id", 'reference student'),
-                    Field("program_id", 'reference program'),
-                    Field("specialization_id", 'reference specialization'),
-                    Field("year_level", type='string', length=3),
-                    Field("current_term", type='string', length=50),
+                    Field("term", type='string', length=50),
                     Field("date_issued", type='date'),
-                    Field("staff_name", 'reference staff'),
-                    Field("revision_num", type='integer', default=0))
+                    Field("registrar", 'reference staff'),
+                    Field("revision", type='integer', default=0),
+                    Field("term_sem", type="string", length=15, notnull=True),
+                    Field("term_year", type="text", length=10, notnull=True))
 
 
     # with open('/home/www-data/web2py/applications/ORS/static/sample_data/colleges.csv', 'r', newline='') as csv_file:

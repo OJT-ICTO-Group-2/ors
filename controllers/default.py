@@ -455,7 +455,6 @@ def get_rle_record_file():
     response.headers['Content-disposition'] = f'attachment; filename={file_name}'
     response.stream(file)
 
-
 def rle_record_view():
     student_id = request.args(0)
     if not student_id:
@@ -493,14 +492,12 @@ def rle_record_view():
     return locals()
 
 #displaying page 10
-def page_ten():
-    #displaying page 10
-def page_ten():
+def enrollment_cert_view():
     student_id = request.args(0)
     if not student_id:
         raise HTTP(400, "Bad request")
         return
-    
+
     student = db(db.student.student_id == student_id).select().first()
     enrollment_certificate = db(db.enrollment_certificate.id == student.id).select().first()
     college = db(db.college.id == student.college_id).select().first()
@@ -510,9 +507,8 @@ def page_ten():
         specialization = db(db.specialization.id == student.specialization_id).select().first()
     else:
         specialization = None
-    
-    staff = db(db.staff.id).select().first()     
+
+    staff = db(db.staff.id).select().first()
     revision_num = db(db.enrollment_certificate.revision_num).select().first()
 
     return locals()
-
