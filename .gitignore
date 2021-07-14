@@ -37,3 +37,4 @@ pip-log.txt
 
 modules/db_creds.py
 **/.~*
+static/sample_data
