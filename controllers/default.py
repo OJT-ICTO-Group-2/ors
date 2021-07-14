@@ -181,8 +181,6 @@ def get_tor_file():
     wb.save(filename=file)
 
     from gluon.contenttype import contenttype
-
-
     response.headers['Content-Type'] = contenttype('xlsx')
     response.headers['Content-disposition'] = f'attachment; filename={file_name}'
     response.stream(file)
@@ -258,7 +256,152 @@ def tor_view():
     return locals()
 
 def get_rle_record_file():
-    pass
+    student_id = request.args(0)
+    if not student_id:
+        raise HTTP(400, "Bad request")
+
+    # get data of student from database
+    student = db(db.student.student_id == student_id).select().first()
+    rle_courses = db().select(db.rle_course.ALL)
+    attended_cr = db(db.attended_community_resource.student_id == student.id).select()
+    rle_record = db(db.rle_record.student_id == student.id).select().first()
+
+    terms = {1, 2, 3, 4}
+
+    term_courses = {}
+
+    total = {"lecture_total": 0, "lecture_units": 0, "rle_hours": 0, "rle_units": 0}
+
+    for term in terms:
+        term_courses[term] = []
+        for course in rle_courses:
+            if course.year_level == term:
+                term_courses[term].append(course)
+                total["lecture_total"] += course.lecture_total
+                total["lecture_units"] += course.lecture_units
+                total["rle_hours"] += course.rle_hours
+                total["rle_units"] += course.rle_units
+
+    attended_cr_dict = {1: [], 2: []}
+    for cr in attended_cr:
+        if cr.community_resource_id.type == 1:
+            attended_cr_dict[1].append(cr)
+        elif cr.community_resource_id.type == 2:
+            attended_cr_dict[2].append(cr)
+
+
+    # script for generating xlsx file of TOR
+    import openpyxl as opx
+
+    # store the file name
+    file_name = f'{student.last_name}-{student.first_name}-{student.middle_name}-TOR.xlsx'.replace(" ", "_")
+
+    # load template file
+    wb = opx.load_workbook(filename='applications/ors/static/rle-record/RLE-Record-Template.xlsx')
+
+    # get current worksheet
+    ws = wb.active
+
+    # write student data to file
+    ws['B8'] = f'{student.last_name}, {student.first_name} {student.middle_name}'.upper()
+    ws['I8'] = student.class_year
+
+
+    row_counter = 12    # initialize row counter
+
+    # write courses to file
+    for term in terms:
+        ws[f'A{row_counter}'] = f'Ladder {term}'
+        for course in term_courses[term]:
+            ws[f'B{row_counter}'] = course.code_subject
+            ws[f'C{row_counter}'] = course.code_digit
+            ws[f'D{row_counter}'] = "-"
+            ws.merge_cells(f'E{row_counter}:G{row_counter}')
+            ws[f'E{row_counter}'] = course.title
+            ws[f'H{row_counter}'] = course.lecture_total
+            ws[f'I{row_counter}'] = course.lecture_units
+            ws[f'J{row_counter}'] = course.rle_hours
+            ws[f'K{row_counter}'] = course.rle_units
+
+            for row in ws.iter_cols(min_row=row_counter, min_col=1, max_row=row_counter, max_col=11):
+                for cell in row:
+                    cell.font = opx.styles.Font(name="Times New Roman", size=10)
+
+            for row in ws.iter_cols(min_row=row_counter, min_col=8, max_row=row_counter, max_col=11):
+                for cell in row:
+                    cell.alignment = opx.styles.Alignment(horizontal="center")
+
+            row_counter += 1
+
+        row_counter += 1
+
+    ws[f'G{row_counter}'] = "TOTAL"
+    ws[f'G{row_counter}'].alignment = opx.styles.Alignment(horizontal="right")
+    ws[f'G{row_counter}'].font = opx.styles.Font(name="Times New Roman", size=10, bold=True)
+
+    ws[f'H{row_counter}'] = total["lecture_total"]
+    ws[f'I{row_counter}'] = total["lecture_units"]
+    ws[f'J{row_counter}'] = f'{total["rle_hours"]:,}'
+    ws[f'K{row_counter}'] = total["rle_units"]
+
+    for row in ws.iter_cols(min_row=row_counter, min_col=8, max_row=row_counter, max_col=11):
+        for cell in row:
+            cell.font = opx.styles.Font(name="Times New Roman", size=10, bold=True)
+            cell.alignment = opx.styles.Alignment(horizontal="center")
+            cell.border = opx.styles.Border(bottom=opx.styles.Side(border_style="double"))
+
+    row_counter += 2
+
+    ws.merge_cells(f'A{row_counter}:D{row_counter}')
+    ws[f'A{row_counter}'] = "COMMUNITY RESOURCES"
+    ws[f'A{row_counter}'].font = opx.styles.Font(name="Times New Roman", bold=True)
+
+    row_counter += 1
+
+    # for category in range(1, 3):
+
+
+    if attended_cr_dict[1]:
+        ws.merge_cells(f'B{row_counter}:G{row_counter}')
+        ws[f'B{row_counter}'] = "1. BARANGAY/MUNICIPALITIES"
+        ws[f'B{row_counter}'].font = opx.styles.Font(name="Times New Roman", size=10, bold=True)
+
+        ws.merge_cells(f'H{row_counter}:I{row_counter}')
+        ws[f'H{row_counter}'] = "No. of Families"
+        ws[f'H{row_counter}'].font = opx.styles.Font(name="Times New Roman", size=10, bold=True)
+        ws[f'H{row_counter}'].alignment = opx.styles.Alignment(horizontal="center")
+
+        ws.merge_cells(f'J{row_counter}:K{row_counter}')
+        ws[f'J{row_counter}'] = "Year Level"
+        ws[f'J{row_counter}'].font = opx.styles.Font(name="Times New Roman", size=10, bold=True)
+        ws[f'J{row_counter}'].alignment = opx.styles.Alignment(horizontal="center")
+
+        row_counter += 1
+
+        for cr in attended_cr_dict[1]:
+            ws.merge_cells(f'C{row_counter}:G{row_counter}')
+            ws[f'C{row_counter}'] = cr.community_resource_id.name
+
+            ws.merge_cells(f'H{row_counter}:I{row_counter}')
+            ws[f'H{row_counter}'] = f'{cr.community_resource_id.families_total:,}'
+            ws[f'H{row_counter}'].alignment = opx.styles.Alignment(horizontal="center")
+
+            ws.merge_cells(f'J{row_counter}:K{row_counter}')
+            ws[f'J{row_counter}'] = cr.year_level
+            ws[f'J{row_counter}'].alignment = opx.styles.Alignment(horizontal="center")
+
+            for row in ws.iter_cols(min_row=row_counter, min_col=3, max_row=row_counter, max_col=11):
+                for cell in row:
+                    cell.font = opx.styles.Font(name="Times New Roman", size=10)
+
+            row_counter += 1
+
+
+
+    file = f'applications/ors/static/rle-record/{file_name}'
+    wb.save(filename=file)
+
+
 
 def rle_record_view():
     student_id = request.args(0)
