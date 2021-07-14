@@ -11,6 +11,7 @@
             <th>No.</th>
             <th>Name</th>
             <th>Download TOR</th>
+            <th>Download RLE Record</th>
           </tr>
         </thead>
         <tbody>
@@ -29,6 +30,15 @@
               <a href="{{=URL('get_tor_file', args=[student.student_id])}}">
                 Download
               </a>
+            </td>
+            <td>
+              {{ if student.program_id == 7: }}
+              <a href="{{=URL('get_rle_record_file', args=[student.student_id])}}">
+                Download
+              </a>
+              {{ else: }}
+              Not available for this student
+              {{ pass }}
             </td>
           </tr>
           {{ pass }}

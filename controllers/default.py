@@ -190,8 +190,7 @@ def tor_view():
     student = db(db.student.student_id == student_id).select().first()
     college = db(db.college.id == student.college_id).select().first()
     program = db(db.program.id == student.program_id).select().first()
-    specialization = db(db.specialization.id == student.specialization_id).select(
-    ).first() if student.specialization_id else None
+    specialization = db(db.specialization.id == student.specialization_id).select().first() if student.specialization_id else None
     grades = db(db.grade.student_id == student.id).select(join=db.course.on(db.grade.course_id == db.course.id),
                                                           orderby=db.grade.term_year | db.grade.term_sem)
 
