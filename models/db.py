@@ -125,11 +125,11 @@ if not request.env.web2py_runtime_gae:
                     Field("revision", type='integer', notnull=True, default=0))
     db.define_table('enrollment_certificate',
                     Field("student_id", 'reference student', notnull=True),
-                    Field("date_issued", type='date'),
-                    Field("registrar", 'reference staff', notnull=True),
-                    Field("revision", type='integer', default=0, notnull=True),
-                    Field("term_sem", type="string", length=15, notnull=True),
-                    Field("term_year", type="text", length=10, notnull=True))
+                    Field("date_issued", type='date', default = request.now, requires = IS_DATE(format=('%d-%m-%Y'))),
+                    Field("registrar", 'reference staff'),
+                    Field("revision", type='integer', default=0),
+                    Field("term_sem", type="string", length=15),
+                    Field("term_year", type="text", length=10))
 
 
     # with open('/home/www-data/web2py/applications/ORS/static/sample_data/colleges.csv', 'r', newline='') as csv_file:

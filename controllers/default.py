@@ -531,23 +531,56 @@ def rle_record_view():
     return locals()
 
 #displaying page 10
-def enrollment_cert_view():
+def page_ten():
     student_id = request.args(0)
     if not student_id:
         raise HTTP(400, "Bad request")
         return
 
+    #  get data of student from database
     student = db(db.student.student_id == student_id).select().first()
     enrollment_certificate = db(db.enrollment_certificate.id == student.id).select().first()
     college = db(db.college.id == student.college_id).select().first()
     program = db(db.program.id == student.program_id).select().first()
+    
+    if student.gender == "Male": "Mr." 
+    else:
+        "Ms."
 
     if student.specialization_id:
         specialization = db(db.specialization.id == student.specialization_id).select().first()
     else:
         specialization = None
+    
+    registrar = db(db.staff.id).select().first()     
+    revision = db(db.enrollment_certificate.revision).select().first()
 
-    staff = db(db.staff.id).select().first()
-    revision_num = db(db.enrollment_certificate.revision_num).select().first()
+    import openpyxl
+    import xml as xml
+
+    file_name = f'{student.last_name}-{student.first_name}-{student.middle_name}-enrollment_certificate.xlsx'.replace(" ", "_")
+    wb = openpyxl.load_workbook('/static/enrollment_certificate.xlsx')
+    ws = wb.active
+    #  print(ws)
+ 
+            
+    ws['I9'] = "Republic of the Philippines"
+    ws['I10'] =  "Bicol University "
+    ws['J11'] = college.name
+    ws['J12'] = college.address
+    ws['J13'] = "Tel. No.", college.contact_number
+
+
+
+
+    file = f'applications/ors/static/tor/{file_name}'
+    wb.save(filename=file)
+
+    from gluon.contenttype import contenttype
+
+
+    response.headers['Content-Type'] = contenttype('xlsx')
+    response.headers['Content-disposition'] = f'attachment; filename={file_name}'
+    response.stream(file)
 
     return locals()
