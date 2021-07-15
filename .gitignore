@@ -35,6 +35,6 @@ pip-log.txt
 #Mr Developer
 .mr.developer.cfg
 
-modules/db_creds.py
+modules
 **/.~*
 static/sample_data
