@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <!-- <link rel="stylesheet" href="/static/css/design.css" /> -->
+        <title>Page_11</title>
+    </head>
+    <body>
+        <div class="center">
+            Republic of the Philippines <br />
+            Bicol University <br />
+            <!--get from db till tel no-->
+            {{ =college.name }}<br />
+            {{ =college.address}}<br />
+            Tel. No. {{ =college.contact_number }}
+        </div>
+        <p
+            style="
+                text-align: center;
+                letter-spacing: 5px;
+                font-weight: bold;
+                font-size: 24px;
+            "
+        >
+            CERTIFICATION
+        </p>
+        <p style="font-weight: bold; margin-top: 35px; margin-bottom: 35px">
+            TO WHOM IT MAY CONCERN:
+        </p>
+        <p class="body" style="text-indent: 45px">
+            This is to certify that
+            <b
+                >{{ =student.gender}} {{ =student.first_name}} {{
+                =student.middle_name}}. {{=student.last_name}}
+            </b>
+            is a bona fied {{=student.year_level }} Year {{ =program.name }} ({{
+            =program.abbreviation }}), major in {{ =specialization.name }}
+            student of this college and is officially enrolled this {{
+            =enrollment_certificate.term_sem }} {{
+            =enrollment_certificate.term_year }}. <br />
+        </p>
+        
+        <p style="text-indent: 45px">
+            It is further certified that she is of good moral character and has never been
+             subjected to any disciplinary action during her entire stay in this University.
+        </p>
+        <p style="text-indent: 45px">
+            Issued at {{=enrollment_certificate.date_issued}} for reference
+            purposes.
+        </p>
+        
+       <div class="staff">LORENA A. ARISPE
+            {{ =registrar.position }}
+       </div>
+        <div class="staff">LINDA B. CAMPOPOS, Ed. D
+          <br>Guidance Coordinator</br>
+        </div>
+        
+        <div class="staff">DELIA B. ROCHA, Ed.D
+           <br>Coordinator, Student Activities
+           <br>Adviser, College Student Council
+        </div>
+        <br>
+        <br>
+        <p>NOTED:</p>
+        <div class="staff">CORAZON N. BAZAR
+          <br>University Registrar</br>
+        </div>
+          
+        <footer>
+            <div class="revision">
+                Revision: {{ =enrollment_certificate.revision }}
+            </div>
+
+            BU-F-UREG-54<br />
+            Effectivity Date: Mar. 9, 2011
+        </footer>
+    </body>
+</html>
+
+<style type="text/css">
+    body {
+        font-size: 17px;
+        font-family: "Times New Roman";
+        color: black;
+        margin-left: 300px;
+        margin-right: 300px;
+        padding: 50px;
+        padding-left: 70px;
+        padding-right: 40px;
+        border: 1px solid black;
+        text-align: justify;
+    }
+  
+    .faculty {
+        float: right;
+        text-align: center;
+        margin-right: 40px;
+        margin-top: 100px;
+    }
+
+    .staff {
+        float: right;
+        text-align: center;
+        margin-right: 80px;
+        margin-top: 100px;
+    }
+
+    footer {
+        font-weight: 500;
+        font-size: 12px;
+        margin-top: 400px;
+        font-family: "Berlin Sans FB";
+    }
+
+    .revision {
+        float: right;
+    }
+
+    .center {
+        margin-top: 10px;
+        text-align: center;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+</style>
