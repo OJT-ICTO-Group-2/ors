@@ -131,7 +131,15 @@ if not request.env.web2py_runtime_gae:
                     Field("revision", type='integer', default=0),
                     Field("term_sem", type="string", length=15),
                     Field("term_year", type="text", length=10))
-
+    db.define_table('good_moral_certificate',
+                    Field("student_id", 'reference student', notnull=True),
+                    Field("date_issued", type='date', default = request.now, requires = IS_DATE(format=('%d-%m-%Y'))),
+                    Field("registrar", 'reference staff'),
+                    Field("signatory1", 'reference staff'),
+                    Field("signatory2", 'reference staff'),
+                    Field("revision", type='integer', default=0),
+                    Field("term_sem", type="string", length=15),
+                    Field("term_year", type="text", length=10))
 
     # with open('/home/www-data/web2py/applications/ORS/static/sample_data/colleges.csv', 'r', newline='') as csv_file:
     #     file = csv.reader(csv_file)
