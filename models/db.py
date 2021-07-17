@@ -64,8 +64,8 @@ if not request.env.web2py_runtime_gae:
                     Field("sem_admitted", type='string', length=25, notnull=True),
                     Field("date_graduated", type='date'),
                     Field("class_year", type='string', length=9),
-                    Field("gender", type='string', length=10, notnull=True),
-                    Field("year_level", type='string', length=3, notnull=True))
+                    Field("gender", type='string', length=10),
+                    Field("year_level", type='string', length=3))
     db.define_table('course',
                     Field("code", type='string', length=15, notnull=True, unique=True),
                     Field("title", type='string', length=80, notnull=True),
