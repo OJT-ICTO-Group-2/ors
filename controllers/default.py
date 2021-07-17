@@ -588,3 +588,26 @@ def page_ten():
     response.stream(file)
 
     return locals()
+
+def page_eleven():
+    student_id = request.args(0)
+    if not student_id:
+        raise HTTP(400, "Bad request")
+        return
+
+    student = db(db.student.student_id == student_id).select().first()
+    good_moral_certificate = db(db.good_moral_certificate.id == student.id).select().first()
+    college = db(db.college.id == student.college_id).select().first()
+    program = db(db.program.id == student.program_id).select().first()
+
+    if student.specialization_id:
+        specialization = db(db.specialization.id == student.specialization_id).select().first()
+    else:
+        specialization = None
+
+    staff = db(db.staff.id).select().first()
+    staff = db(db.signatory1.id).select().first()
+    staff = db(db.signatory2.id).select().first()
+    revision_num = db(db.good_moral_certificate.revision_num).select().first()
+    
+    return locals()
