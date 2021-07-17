@@ -3,11 +3,17 @@
 # This is a sample controller
 # this file is released under public domain and you can use without limitations
 # -------------------------------------------------------------------------
+def make_ordinal(n):
+    n = int(n)
+    suffix = ['th', 'st', 'nd', 'rd', 'th'][min(n % 10, 4)]
+    if 11 <= (n % 100) <= 13:
+        suffix = 'th'
+    return str(n) + suffix
+
 
 def index():
     students = db(db.student).select(orderby=db.student.id)
     return locals()
-
 
 def get_tor_file():
     # function to generate an xlsx file of the student's TOR
@@ -549,6 +555,7 @@ def enrollment_certificate():
 
     title = {"Male": "Mr.", "Female": "Ms."}
     suffix = {1: "st", 2: "nd", 3: "rd", 4: "th", 5: "th", 6: "th"}
+    day_issued = make_ordinal(enrollment_certificate.date_issued.strftime("%d"))
 
     return locals()
 
