@@ -3,11 +3,17 @@
 # This is a sample controller
 # this file is released under public domain and you can use without limitations
 # -------------------------------------------------------------------------
+def make_ordinal(n):
+    n = int(n)
+    suffix = ['th', 'st', 'nd', 'rd', 'th'][min(n % 10, 4)]
+    if 11 <= (n % 100) <= 13:
+        suffix = 'th'
+    return str(n) + suffix
+
 
 def index():
     students = db(db.student).select(orderby=db.student.id)
     return locals()
-
 
 def get_tor_file():
     # function to generate an xlsx file of the student's TOR
@@ -187,7 +193,7 @@ def get_tor_file():
     response.headers['Content-disposition'] = f'attachment; filename={file_name}'
     response.stream(file)
 
-def tor_view():
+def tor():
     # controller for TOR view
 
     student_id = request.args(0)
@@ -486,7 +492,7 @@ def get_rle_record_file():
     response.headers['Content-disposition'] = f'attachment; filename={file_name}'
     response.stream(file)
 
-def rle_record_view():
+def rle_record():
     # This function takes the student id as argument and returns the view for the student's RLE record
 
     # get the student id
@@ -534,8 +540,7 @@ def rle_record_view():
 
     return locals()
 
-#displaying page 10
-def page_ten():
+def enrollment_certificate():
     student_id = request.args(0)
     if not student_id:
         raise HTTP(400, "Bad request")
@@ -544,48 +549,13 @@ def page_ten():
     #  get data of student from database
     student = db(db.student.student_id == student_id).select().first()
     enrollment_certificate = db(db.enrollment_certificate.id == student.id).select().first()
-    college = db(db.college.id == student.college_id).select().first()
-    program = db(db.program.id == student.program_id).select().first()
-
-    if student.gender == "Male": "Mr."
-    else:
-        "Ms."
-
-    if student.specialization_id:
-        specialization = db(db.specialization.id == student.specialization_id).select().first()
-    else:
-        specialization = None
 
     registrar = db(db.staff.id).select().first()
     revision = db(db.enrollment_certificate.revision).select().first()
 
-    import openpyxl
-    import xml as xml
-
-    file_name = f'{student.last_name}-{student.first_name}-{student.middle_name}-enrollment_certificate.xlsx'.replace(" ", "_")
-    wb = openpyxl.load_workbook('/static/enrollment_certificate.xlsx')
-    ws = wb.active
-    #  print(ws)
-
-
-    ws['I9'] = "Republic of the Philippines"
-    ws['I10'] =  "Bicol University "
-    ws['J11'] = college.name
-    ws['J12'] = college.address
-    ws['J13'] = "Tel. No.", college.contact_number
-
-
-
-
-    file = f'applications/ors/static/tor/{file_name}'
-    wb.save(filename=file)
-
-    from gluon.contenttype import contenttype
-
-
-    response.headers['Content-Type'] = contenttype('xlsx')
-    response.headers['Content-disposition'] = f'attachment; filename={file_name}'
-    response.stream(file)
+    title = {"Male": "Mr.", "Female": "Ms."}
+    suffix = {1: "st", 2: "nd", 3: "rd", 4: "th", 5: "th", 6: "th"}
+    day_issued = make_ordinal(enrollment_certificate.date_issued.strftime("%d"))
 
     return locals()
 

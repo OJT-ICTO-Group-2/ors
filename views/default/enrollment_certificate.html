@@ -10,9 +10,11 @@
             Republic of the Philippines <br />
             Bicol University <br />
             <!--get from db till tel no-->
-            {{ =college.name }}<br />
-            {{ =college.address}}<br />
-            Tel. No. {{ =college.contact_number }}
+            {{ =student.college_id.name }}<br />
+            {{ =student.college_id.address}}<br />
+            {{ if student.college_id.contact_number: }}
+            Tel. No. {{ =student.college_id.contact_number }}
+            {{ pass }}
         </div>
         <p
             style="
@@ -29,18 +31,21 @@
         </p>
         <p class="body" style="text-indent: 45px">
             This is to certify that
-            <b
-                >{{ =student.gender}} {{ =student.first_name}} {{
-                =student.middle_name}}. {{=student.last_name}}
+            <b>
+                {{ =title[student.gender] }}
+                {{ =student.first_name}}
+                {{ =student.middle_name[0] }}.
+                {{ =student.last_name}}
             </b>
-            is a bona fied {{=student.year_level }} Year {{ =program.name }} ({{
-            =program.abbreviation }}), major in {{ =specialization.name }}
-            student of this college and is officially enrolled this {{
-            =enrollment_certificate.term_sem }} {{
-            =enrollment_certificate.term_year }}. <br />
+            is a bona fied {{ =f'{student.year_level}{suffix[int(student.year_level)]}' }} Year {{ =student.program_id.name }} ({{
+            =student.program_id.abbreviation }}){{ if student.specialization_id: }}, major in {{ =student.specialization_id.name }}
+            {{ pass }}
+            student of this college and is officially enrolled this
+            {{ =f'{enrollment_certificate.term_sem}{suffix[int(enrollment_certificate.term_sem)]} Semester,' }}
+            {{ =enrollment_certificate.term_year }}. <br />
         </p>
         <p style="text-indent: 45px">
-            Issued at {{=enrollment_certificate.date_issued}} for reference
+            Issued this {{ =day_issued }} day of {{ =enrollment_certificate.date_issued.strftime("%B, %Y") }} for reference
             purposes.
         </p>
         <div class="staff">
