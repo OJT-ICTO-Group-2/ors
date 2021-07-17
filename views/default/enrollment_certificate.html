@@ -32,7 +32,7 @@
         <p class="body" style="text-indent: 45px">
             This is to certify that
             <b>
-                {{ =title[student.gender] }}
+                {{ =honorific[student.gender] }}
                 {{ =student.first_name}}
                 {{ =student.middle_name[0] }}.
                 {{ =student.last_name}}
@@ -42,11 +42,10 @@
             {{ pass }}
             student of this college and is officially enrolled this
             {{ =f'{enrollment_certificate.term_sem}{suffix[int(enrollment_certificate.term_sem)]} Semester,' }}
-            {{ =enrollment_certificate.term_year }}. <br />
-        </p>
+           {{ =enrollment_certificate.term_year }}. <br/>
         <p style="text-indent: 45px">
-            Issued this {{ =day_issued }} day of {{ =enrollment_certificate.date_issued.strftime("%B, %Y") }} for reference
-            purposes.
+          Issued this {{ =day_issued }} day of {{ =enrollment_certificate.date_issued.strftime("%B, %Y") }} for reference
+          purposes.
         </p>
         <div class="staff">
             {{ =registrar.name }} <br />

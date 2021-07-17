@@ -553,7 +553,7 @@ def enrollment_certificate():
     registrar = db(db.staff.id).select().first()
     revision = db(db.enrollment_certificate.revision).select().first()
 
-    title = {"Male": "Mr.", "Female": "Ms."}
+    honorific = {"Male": "Mr.", "Female": "Ms."}
     suffix = {1: "st", 2: "nd", 3: "rd", 4: "th", 5: "th", 6: "th"}
     day_issued = make_ordinal(enrollment_certificate.date_issued.strftime("%d"))
 
@@ -571,5 +571,6 @@ def good_moral_certificate():
     suffix = {1: "st", 2: "nd", 3: "rd", 4: "th", 5: "th", 6: "th"}
     pronoun_sub = {"Male": "he", "Female": "she"}
     pronoun_pos = {"Male": "his", "Female": "her"}
+    day_issued = make_ordinal(good_moral_certificate.date_issued.strftime("%d"))
 
     return locals()

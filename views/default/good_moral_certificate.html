@@ -41,7 +41,8 @@
             It is further certified that {{ =pronoun_sub[student.gender] }} is of good moral character and has never been subjected to any disciplinary action during {{ =pronoun_pos[student.gender] }} entire stay in this University.
         </p>
         <p style="text-indent: 45px">
-            Issued at {{ =good_moral_certificate.date_issued }} for reference purposes.
+          Issued this {{ =day_issued }} day of {{ =enrollment_certificate.date_issued.strftime("%B, %Y") }} for reference
+          purposes.
         </p>
         <div class="staff">
             {{ =good_moral_certificate.registrar.name }} <br />
