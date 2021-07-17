@@ -10,6 +10,8 @@ def index():
 
 
 def get_tor_file():
+    # function to generate an xlsx file of the student's TOR
+
     student_id = request.args(0)
     if not student_id:
         raise HTTP(400, "Bad request")
@@ -186,6 +188,8 @@ def get_tor_file():
     response.stream(file)
 
 def tor_view():
+    # controller for TOR view
+
     student_id = request.args(0)
     student = db(db.student.student_id == student_id).select().first()
     college = db(db.college.id == student.college_id).select().first()
@@ -542,8 +546,8 @@ def page_ten():
     enrollment_certificate = db(db.enrollment_certificate.id == student.id).select().first()
     college = db(db.college.id == student.college_id).select().first()
     program = db(db.program.id == student.program_id).select().first()
-    
-    if student.gender == "Male": "Mr." 
+
+    if student.gender == "Male": "Mr."
     else:
         "Ms."
 
@@ -551,8 +555,8 @@ def page_ten():
         specialization = db(db.specialization.id == student.specialization_id).select().first()
     else:
         specialization = None
-    
-    registrar = db(db.staff.id).select().first()     
+
+    registrar = db(db.staff.id).select().first()
     revision = db(db.enrollment_certificate.revision).select().first()
 
     import openpyxl
@@ -562,8 +566,8 @@ def page_ten():
     wb = openpyxl.load_workbook('/static/enrollment_certificate.xlsx')
     ws = wb.active
     #  print(ws)
- 
-            
+
+
     ws['I9'] = "Republic of the Philippines"
     ws['I10'] =  "Bicol University "
     ws['J11'] = college.name
