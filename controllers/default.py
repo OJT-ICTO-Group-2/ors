@@ -588,3 +588,29 @@ def page_ten():
     response.stream(file)
 
     return locals()
+
+#page_eleven
+def page_eleven():
+    student_id = request.args(0)
+    if not student_id:
+        raise HTTP(400, "Bad request")
+        return
+
+    #  get data of student from database
+    student = db(db.student.student_id == student_id).select().first()
+    enrollment_certificate = db(db.enrollment_certificate.id == student.id).select().first()
+    college = db(db.college.id == student.college_id).select().first()
+    program = db(db.program.id == student.program_id).select().first()
+    
+    if student.gender == "Male": "Mr." 
+    else:
+        "Ms."
+
+    if student.specialization_id:
+        specialization = db(db.specialization.id == student.specialization_id).select().first()
+    else:
+        specialization = None
+    
+    registrar = db(db.staff.id).select().first()     
+    revision = db(db.enrollment_certificate.revision).select().first()
+    return locals()
