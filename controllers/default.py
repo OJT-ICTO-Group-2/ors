@@ -543,20 +543,12 @@ def enrollment_certificate():
     #  get data of student from database
     student = db(db.student.student_id == student_id).select().first()
     enrollment_certificate = db(db.enrollment_certificate.id == student.id).select().first()
-    college = db(db.college.id == student.college_id).select().first()
-    program = db(db.program.id == student.program_id).select().first()
-
-    if student.gender == "Male": "Mr."
-    else:
-        "Ms."
-
-    if student.specialization_id:
-        specialization = db(db.specialization.id == student.specialization_id).select().first()
-    else:
-        specialization = None
 
     registrar = db(db.staff.id).select().first()
     revision = db(db.enrollment_certificate.revision).select().first()
+
+    title = {"Male": "Mr.", "Female": "Ms."}
+    suffix = {1: "st", 2: "nd", 3: "rd", 4: "th", 5: "th", 6: "th"}
 
     return locals()
 
