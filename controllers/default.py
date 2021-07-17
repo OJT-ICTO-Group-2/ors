@@ -15,7 +15,7 @@ def index():
     students = db(db.student).select(orderby=db.student.id)
     return locals()
 
-def get_tor_file():
+def tor_download():
     # function to generate an xlsx file of the student's TOR
 
     student_id = request.args(0)
@@ -62,7 +62,6 @@ def get_tor_file():
     attestor = db(db.faculty.id == transcript.attestor_id).select().first()     # indorsed by
     reviewer = db(db.faculty.id == transcript.reviewer_id).select().first()     # reviewed by
     registrar = db(db.staff.id == transcript.registrar_id).select().first()     # certified true
-
 
     # script for generating xlsx file of TOR
     import openpyxl as opx
@@ -264,234 +263,6 @@ def tor():
 
     return locals()
 
-def get_rle_record_file():
-    # This function takes the student id as argument and returns an xlsx file of the student's rle record
-
-    # get the student id
-    student_id = request.args(0)
-    if not student_id:
-        raise HTTP(400, "Bad request")
-
-    # get data of student from database
-    student = db(db.student.student_id == student_id).select().first()
-    rle_courses = db().select(db.rle_course.ALL)
-    attended_cr = db(db.attended_community_resource.student_id == student.id).select()
-    rle_record = db(db.rle_record.student_id == student.id).select().first()
-
-    # list the terms (year levels)
-    terms = {1, 2, 3, 4}
-
-    # initialize an empty dictionary for the list of courses for each term
-    term_courses = {}
-
-    # initialize the total values to zero
-    total = {"lecture_total": 0, "lecture_units": 0, "rle_hours": 0, "rle_units": 0}
-
-    # iterate over each rle course and store it to respective term and calculate for the total values
-    for term in terms:
-        term_courses[term] = []
-        for course in rle_courses:
-            if course.year_level == term:
-                term_courses[term].append(course)
-                total["lecture_total"] += course.lecture_total
-                total["lecture_units"] += course.lecture_units
-                total["rle_hours"] += course.rle_hours
-                total["rle_units"] += course.rle_units
-
-    # create a dictionary for the attended community resources of the student using the category as key
-    # key 1: Barangay/Municipalities
-    # key 2: Hospital/Clinics
-    attended_cr_dict = {1: [], 2: []}
-
-    # loop over the community resources and store to attended_cr_dict according to category
-    for cr in attended_cr:
-        if cr.community_resource_id.type == 1:
-            attended_cr_dict[1].append(cr)
-        elif cr.community_resource_id.type == 2:
-            attended_cr_dict[2].append(cr)
-
-
-    # script for generating xlsx file of TOR
-    import openpyxl as opx
-
-    # store the file name
-    file_name = f'{student.last_name}-{student.first_name}-{student.middle_name}-TOR.xlsx'.replace(" ", "_")
-
-    # load template file
-    wb = opx.load_workbook(filename='applications/ors/static/templates/RLE-Record-Template.xlsx')
-
-    # get current worksheet
-    ws = wb.active
-
-    # write student data to file
-    ws['B8'] = f'{student.last_name}, {student.first_name} {student.middle_name}'.upper()
-    ws['I8'] = student.class_year
-
-    # initialize row counter
-    row_counter = 12
-
-    # write courses to file
-    for term in terms:
-        ws[f'A{row_counter}'] = f'Ladder {term}'
-        for course in term_courses[term]:
-            ws[f'B{row_counter}'] = course.code_subject
-            ws[f'C{row_counter}'] = course.code_digit
-            ws[f'D{row_counter}'] = "-"
-            ws.merge_cells(f'E{row_counter}:G{row_counter}')
-            ws[f'E{row_counter}'] = course.title
-            ws[f'H{row_counter}'] = course.lecture_total
-            ws[f'I{row_counter}'] = course.lecture_units
-            ws[f'J{row_counter}'] = course.rle_hours
-            ws[f'K{row_counter}'] = course.rle_units
-
-            # format cells font and alignment
-            for row in ws.iter_cols(min_row=row_counter, min_col=1, max_row=row_counter, max_col=11):
-                for cell in row:
-                    cell.font = opx.styles.Font(name="Times New Roman", size=10)
-
-            for row in ws.iter_cols(min_row=row_counter, min_col=8, max_row=row_counter, max_col=11):
-                for cell in row:
-                    cell.alignment = opx.styles.Alignment(horizontal="center")
-
-            row_counter += 1
-
-        row_counter += 1
-
-    # write the total values to file
-    ws[f'G{row_counter}'] = "TOTAL"
-    ws[f'G{row_counter}'].alignment = opx.styles.Alignment(horizontal="right")
-    ws[f'G{row_counter}'].font = opx.styles.Font(name="Times New Roman", size=10, bold=True)
-
-    ws[f'H{row_counter}'] = total["lecture_total"]
-    ws[f'I{row_counter}'] = total["lecture_units"]
-    ws[f'J{row_counter}'] = f'{total["rle_hours"]:,}'
-    ws[f'K{row_counter}'] = total["rle_units"]
-
-    # format cells font, alignment, and border
-    for row in ws.iter_cols(min_row=row_counter, min_col=8, max_row=row_counter, max_col=11):
-        for cell in row:
-            cell.font = opx.styles.Font(name="Times New Roman", size=10, bold=True)
-            cell.alignment = opx.styles.Alignment(horizontal="center")
-            cell.border = opx.styles.Border(bottom=opx.styles.Side(border_style="double"))
-
-    # write attended community resources to file
-    row_counter += 2
-    ws.merge_cells(f'A{row_counter}:D{row_counter}')
-    ws[f'A{row_counter}'] = "COMMUNITY RESOURCES"
-    ws[f'A{row_counter}'].font = opx.styles.Font(name="Times New Roman", bold=True)
-
-    row_counter += 1
-    # loop for every category in attended_cr_dict
-    for category in range(1, 3):
-        # check if there are community resources for the current category
-        if attended_cr_dict[category]:
-            # write the category to file
-            ws.merge_cells(f'B{row_counter}:G{row_counter}')
-            if category == 1:
-                ws[f'B{row_counter}'] = "1. BARANGAY/MUNICIPALITIES"
-            elif category == 2 and attended_cr_dict[1]:
-                ws[f'B{row_counter}'] = "2. HOSPITALS/CLINICS"
-            elif category == 2 and not attended_cr_dict[1]:
-                ws[f'B{row_counter}'] = "1. HOSPITALS/CLINICS"
-            # format the cell font
-            ws[f'B{row_counter}'].font = opx.styles.Font(name="Times New Roman", size=10, bold=True)
-
-            # write to file the second table header depending on the category
-            ws.merge_cells(f'H{row_counter}:I{row_counter}')
-            if category == 1:
-                ws[f'H{row_counter}'] = "No. of Families"
-            elif category == 2 and attended_cr_dict[1]:
-                ws[f'H{row_counter}'] = "Daily Average Patient"
-            # format the cell font and alignment
-            ws[f'H{row_counter}'].font = opx.styles.Font(name="Times New Roman", size=10, bold=True)
-            ws[f'H{row_counter}'].alignment = opx.styles.Alignment(horizontal="center")
-
-            # write the third table header to file
-            ws.merge_cells(f'J{row_counter}:K{row_counter}')
-            ws[f'J{row_counter}'] = "Year Level"
-            # format the cell font and alignment
-            ws[f'J{row_counter}'].font = opx.styles.Font(name="Times New Roman", size=10, bold=True)
-            ws[f'J{row_counter}'].alignment = opx.styles.Alignment(horizontal="center")
-
-            row_counter += 1
-            # loop over the community resources stored in the list for the current category
-            for cr in attended_cr_dict[category]:
-                # write to file the name of the community resource and format cell alignment
-                ws.merge_cells(f'C{row_counter}:G{row_counter}')
-                ws[f'C{row_counter}'] = cr.community_resource_id.name
-                ws[f'C{row_counter}'].alignment = opx.styles.Alignment(wrap_text=True)
-                if len(cr.community_resource_id.name) > 57:
-                    ws.row_dimensions[row_counter].height = 28
-
-                # write to file the community resource's total famiies or daily average patient depending on the category
-                ws.merge_cells(f'H{row_counter}:I{row_counter}')
-                ws[f'H{row_counter}'].alignment = opx.styles.Alignment(horizontal="center")
-                if category == 1:
-                    ws[f'H{row_counter}'] = f'{cr.community_resource_id.families_total:,}'
-                elif category == 2:
-                    ws[f'H{row_counter}'] = f'{cr.community_resource_id.patients_daily_ave:,}'
-
-                # write to file the year level when the student attended the community resource and format cell alignment
-                ws.merge_cells(f'J{row_counter}:K{row_counter}')
-                ws[f'J{row_counter}'] = cr.year_level
-                ws[f'J{row_counter}'].alignment = opx.styles.Alignment(horizontal="center")
-
-                # format cells font
-                for row in ws.iter_cols(min_row=row_counter, min_col=3, max_row=row_counter, max_col=11):
-                    for cell in row:
-                        cell.font = opx.styles.Font(name="Times New Roman", size=10)
-
-                row_counter += 1
-
-    # write to file the date completed field
-    row_counter += 1
-    ws.merge_cells(f'A{row_counter}:B{row_counter}')
-    ws[f'A{row_counter}'] = "Date Completed: "
-    ws[f'A{row_counter}'].font = opx.styles.Font(name="Times New Roman", bold=True)
-    ws[f'C{row_counter}'] = student.date_graduated.strftime("%B %-d, %Y")
-    ws[f'C{row_counter}'].font = opx.styles.Font(name="Times New Roman")
-
-    # write to file the name of the dean of the college and format cells font and alignment
-    row_counter += 3
-    ws.merge_cells(f'G{row_counter}:K{row_counter}')
-    ws[f'G{row_counter}'] = f'{student.college_id.dean.name.upper()}{f", {student.college_id.dean.title}" if student.college_id.dean.title else ""}'
-    ws[f'G{row_counter}'].font = opx.styles.Font(name="Times New Roman", bold=True)
-    ws[f'G{row_counter}'].alignment = opx.styles.Alignment(horizontal="center")
-    row_counter+=1
-    ws.merge_cells(f'G{row_counter}:K{row_counter}')
-    ws[f'G{row_counter}'] = "Dean"
-    ws[f'G{row_counter}'].font = opx.styles.Font(name="Times New Roman")
-    ws[f'G{row_counter}'].alignment = opx.styles.Alignment(horizontal="center")
-
-
-    # write to file the name of the refistrar of the college and format cells font and alignment
-    row_counter += 2
-    ws[f'B{row_counter}'] = "Noted:"
-    ws[f'B{row_counter}'].font = opx.styles.Font(name="Times New Roman")
-    row_counter += 2
-    ws.merge_cells(f'B{row_counter}:F{row_counter}')
-    ws[f'B{row_counter}'] = f'{rle_record.registrar_id.name.upper()}{f", {rle_record.registrar_id.title}" if rle_record.registrar_id.title else ""}'
-    ws[f'B{row_counter}'].font = opx.styles.Font(name="Times New Roman", bold=True)
-    ws[f'B{row_counter}'].alignment = opx.styles.Alignment(horizontal="center")
-    row_counter += 1
-    ws.merge_cells(f'B{row_counter}:F{row_counter}')
-    ws[f'B{row_counter}'] = f'{rle_record.registrar_id.position}'
-    ws[f'B{row_counter}'].font = opx.styles.Font(name="Times New Roman")
-    ws[f'B{row_counter}'].alignment = opx.styles.Alignment(horizontal="center")
-
-    # write to file the revision number of the certificate
-    ws['J58'] = f'Revision: {rle_record.revision}'
-
-    # save the xlsx file
-    file = f'applications/ors/documents/rle-record/{file_name}'
-    wb.save(filename=file)
-
-    # return the generated file as a response
-    from gluon.contenttype import contenttype
-    response.headers['Content-Type'] = contenttype('xlsx')
-    response.headers['Content-disposition'] = f'attachment; filename={file_name}'
-    response.stream(file)
-
 def rle_record():
     # This function takes the student id as argument and returns the view for the student's RLE record
 
@@ -538,7 +309,190 @@ def rle_record():
         elif cr.community_resource_id.type == 2:
             attended_cr_dict[2].append(cr)
 
-    return locals()
+    if not request.args(1):
+        return locals()
+    elif request.args(1) == "download":
+        # script for generating xlsx file of TOR
+        import openpyxl as opx
+
+        # store the file name
+        file_name = f'{student.last_name}-{student.first_name}-{student.middle_name}-TOR.xlsx'.replace(" ", "_")
+
+        # load template file
+        wb = opx.load_workbook(filename='applications/ors/static/templates/RLE-Record-Template.xlsx')
+
+        # get current worksheet
+        ws = wb.active
+
+        # write student data to file
+        ws['B8'] = f'{student.last_name}, {student.first_name} {student.middle_name}'.upper()
+        ws['I8'] = student.class_year
+
+        # initialize row counter
+        row_counter = 12
+
+        # write courses to file
+        for term in terms:
+            ws[f'A{row_counter}'] = f'Ladder {term}'
+            for course in term_courses[term]:
+                ws[f'B{row_counter}'] = course.code_subject
+                ws[f'C{row_counter}'] = course.code_digit
+                ws[f'D{row_counter}'] = "-"
+                ws.merge_cells(f'E{row_counter}:G{row_counter}')
+                ws[f'E{row_counter}'] = course.title
+                ws[f'H{row_counter}'] = course.lecture_total
+                ws[f'I{row_counter}'] = course.lecture_units
+                ws[f'J{row_counter}'] = course.rle_hours
+                ws[f'K{row_counter}'] = course.rle_units
+
+                # format cells font and alignment
+                for row in ws.iter_cols(min_row=row_counter, min_col=1, max_row=row_counter, max_col=11):
+                    for cell in row:
+                        cell.font = opx.styles.Font(name="Times New Roman", size=10)
+
+                for row in ws.iter_cols(min_row=row_counter, min_col=8, max_row=row_counter, max_col=11):
+                    for cell in row:
+                        cell.alignment = opx.styles.Alignment(horizontal="center")
+
+                row_counter += 1
+
+            row_counter += 1
+
+        # write the total values to file
+        ws[f'G{row_counter}'] = "TOTAL"
+        ws[f'G{row_counter}'].alignment = opx.styles.Alignment(horizontal="right")
+        ws[f'G{row_counter}'].font = opx.styles.Font(name="Times New Roman", size=10, bold=True)
+
+        ws[f'H{row_counter}'] = total["lecture_total"]
+        ws[f'I{row_counter}'] = total["lecture_units"]
+        ws[f'J{row_counter}'] = f'{total["rle_hours"]:,}'
+        ws[f'K{row_counter}'] = total["rle_units"]
+
+        # format cells font, alignment, and border
+        for row in ws.iter_cols(min_row=row_counter, min_col=8, max_row=row_counter, max_col=11):
+            for cell in row:
+                cell.font = opx.styles.Font(name="Times New Roman", size=10, bold=True)
+                cell.alignment = opx.styles.Alignment(horizontal="center")
+                cell.border = opx.styles.Border(bottom=opx.styles.Side(border_style="double"))
+
+        # write attended community resources to file
+        row_counter += 2
+        ws.merge_cells(f'A{row_counter}:D{row_counter}')
+        ws[f'A{row_counter}'] = "COMMUNITY RESOURCES"
+        ws[f'A{row_counter}'].font = opx.styles.Font(name="Times New Roman", bold=True)
+
+        row_counter += 1
+        # loop for every category in attended_cr_dict
+        for category in range(1, 3):
+            # check if there are community resources for the current category
+            if attended_cr_dict[category]:
+                # write the category to file
+                ws.merge_cells(f'B{row_counter}:G{row_counter}')
+                if category == 1:
+                    ws[f'B{row_counter}'] = "1. BARANGAY/MUNICIPALITIES"
+                elif category == 2 and attended_cr_dict[1]:
+                    ws[f'B{row_counter}'] = "2. HOSPITALS/CLINICS"
+                elif category == 2 and not attended_cr_dict[1]:
+                    ws[f'B{row_counter}'] = "1. HOSPITALS/CLINICS"
+                # format the cell font
+                ws[f'B{row_counter}'].font = opx.styles.Font(name="Times New Roman", size=10, bold=True)
+
+                # write to file the second table header depending on the category
+                ws.merge_cells(f'H{row_counter}:I{row_counter}')
+                if category == 1:
+                    ws[f'H{row_counter}'] = "No. of Families"
+                elif category == 2 and attended_cr_dict[1]:
+                    ws[f'H{row_counter}'] = "Daily Average Patient"
+                # format the cell font and alignment
+                ws[f'H{row_counter}'].font = opx.styles.Font(name="Times New Roman", size=10, bold=True)
+                ws[f'H{row_counter}'].alignment = opx.styles.Alignment(horizontal="center")
+
+                # write the third table header to file
+                ws.merge_cells(f'J{row_counter}:K{row_counter}')
+                ws[f'J{row_counter}'] = "Year Level"
+                # format the cell font and alignment
+                ws[f'J{row_counter}'].font = opx.styles.Font(name="Times New Roman", size=10, bold=True)
+                ws[f'J{row_counter}'].alignment = opx.styles.Alignment(horizontal="center")
+
+                row_counter += 1
+                # loop over the community resources stored in the list for the current category
+                for cr in attended_cr_dict[category]:
+                    # write to file the name of the community resource and format cell alignment
+                    ws.merge_cells(f'C{row_counter}:G{row_counter}')
+                    ws[f'C{row_counter}'] = cr.community_resource_id.name
+                    ws[f'C{row_counter}'].alignment = opx.styles.Alignment(wrap_text=True)
+                    if len(cr.community_resource_id.name) > 57:
+                        ws.row_dimensions[row_counter].height = 28
+
+                    # write to file the community resource's total famiies or daily average patient depending on the category
+                    ws.merge_cells(f'H{row_counter}:I{row_counter}')
+                    ws[f'H{row_counter}'].alignment = opx.styles.Alignment(horizontal="center")
+                    if category == 1:
+                        ws[f'H{row_counter}'] = f'{cr.community_resource_id.families_total:,}'
+                    elif category == 2:
+                        ws[f'H{row_counter}'] = f'{cr.community_resource_id.patients_daily_ave:,}'
+
+                    # write to file the year level when the student attended the community resource and format cell alignment
+                    ws.merge_cells(f'J{row_counter}:K{row_counter}')
+                    ws[f'J{row_counter}'] = cr.year_level
+                    ws[f'J{row_counter}'].alignment = opx.styles.Alignment(horizontal="center")
+
+                    # format cells font
+                    for row in ws.iter_cols(min_row=row_counter, min_col=3, max_row=row_counter, max_col=11):
+                        for cell in row:
+                            cell.font = opx.styles.Font(name="Times New Roman", size=10)
+
+                    row_counter += 1
+
+        # write to file the date completed field
+        row_counter += 1
+        ws.merge_cells(f'A{row_counter}:B{row_counter}')
+        ws[f'A{row_counter}'] = "Date Completed: "
+        ws[f'A{row_counter}'].font = opx.styles.Font(name="Times New Roman", bold=True)
+        ws[f'C{row_counter}'] = student.date_graduated.strftime("%B %-d, %Y")
+        ws[f'C{row_counter}'].font = opx.styles.Font(name="Times New Roman")
+
+        # write to file the name of the dean of the college and format cells font and alignment
+        row_counter += 3
+        ws.merge_cells(f'G{row_counter}:K{row_counter}')
+        ws[f'G{row_counter}'] = f'{student.college_id.dean.name.upper()}{f", {student.college_id.dean.title}" if student.college_id.dean.title else ""}'
+        ws[f'G{row_counter}'].font = opx.styles.Font(name="Times New Roman", bold=True)
+        ws[f'G{row_counter}'].alignment = opx.styles.Alignment(horizontal="center")
+        row_counter+=1
+        ws.merge_cells(f'G{row_counter}:K{row_counter}')
+        ws[f'G{row_counter}'] = "Dean"
+        ws[f'G{row_counter}'].font = opx.styles.Font(name="Times New Roman")
+        ws[f'G{row_counter}'].alignment = opx.styles.Alignment(horizontal="center")
+
+
+        # write to file the name of the refistrar of the college and format cells font and alignment
+        row_counter += 2
+        ws[f'B{row_counter}'] = "Noted:"
+        ws[f'B{row_counter}'].font = opx.styles.Font(name="Times New Roman")
+        row_counter += 2
+        ws.merge_cells(f'B{row_counter}:F{row_counter}')
+        ws[f'B{row_counter}'] = f'{rle_record.registrar_id.name.upper()}{f", {rle_record.registrar_id.title}" if rle_record.registrar_id.title else ""}'
+        ws[f'B{row_counter}'].font = opx.styles.Font(name="Times New Roman", bold=True)
+        ws[f'B{row_counter}'].alignment = opx.styles.Alignment(horizontal="center")
+        row_counter += 1
+        ws.merge_cells(f'B{row_counter}:F{row_counter}')
+        ws[f'B{row_counter}'] = f'{rle_record.registrar_id.position}'
+        ws[f'B{row_counter}'].font = opx.styles.Font(name="Times New Roman")
+        ws[f'B{row_counter}'].alignment = opx.styles.Alignment(horizontal="center")
+
+        # write to file the revision number of the certificate
+        ws['J58'] = f'Revision: {rle_record.revision}'
+
+        # save the xlsx file
+        file = f'applications/ors/documents/rle-record/{file_name}'
+        wb.save(filename=file)
+
+        # return the generated file as a response
+        from gluon.contenttype import contenttype
+        response.headers['Content-Type'] = contenttype('xlsx')
+        response.headers['Content-disposition'] = f'attachment; filename={file_name}'
+        response.stream(file)
+
 
 def enrollment_certificate():
     student_id = request.args(0)
