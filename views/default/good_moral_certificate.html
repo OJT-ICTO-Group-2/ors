@@ -7,54 +7,55 @@
     </head>
     <body>
         <div class="center">
-            Republic of the Philippines <br />
-            Bicol University <br />
-            <!--get from db till tel no-->
-            {{ =college.name }}<br />
-            {{ =college.address}}<br />
-            Tel. No. {{ =college.contact_number }}
+          Republic of the Philippines <br />
+          Bicol University <br />
+          <!--get from db till tel no-->
+          {{ =student.college_id.name }}<br />
+          {{ =student.college_id.address}}<br />
+          {{ if student.college_id.contact_number: }}
+          Tel. No. {{ =student.college_id.contact_number }}
+          {{ pass }}
         </div>
         <p>
             CERTIFICATION
         </p>
-        
+
         <p style="font-weight: bold; margin-top: 35px; margin-bottom: 35px">
             TO WHOM IT MAY CONCERN:
         </p>
         <p class="body" style="text-indent: 45px">
             This is to certify that
-            <b
-                >{{ =student.gender}} {{ =student.first_name}} {{
-                =student.middle_name}}. {{=student.last_name}}
+            <b>
+              {{ =honorific[student.gender] }}
+              {{ =student.first_name}}
+              {{ =student.middle_name[0] }}.
+              {{ =student.last_name}}
             </b>
-            is a bona fied {{=student.year_level }} Year {{ =program.name }} ({{
-            =program.abbreviation }}), major in {{ =specialization.name }}
-            student of this college and is officially enrolled this {{
-            =good_moral_certificate.term_sem }} {{
-            =good_moral_certificate.term_year }}. <br />
+            is a bona fied {{ =f'{student.year_level}{suffix[int(student.year_level)]}' }} Year {{ =student.program_id.name }} ({{
+            =student.program_id.abbreviation }}){{ if student.specialization_id: }}, major in {{ =student.specialization_id.name }}
+            {{ pass }}
+            student of this college. <br>
         </p>
 
         <p style="text-indent: 45px">
-            It is further certified that she is of good moral character and has never been
-             subjected to any disciplinary action during her entire stay in this University.
+            It is further certified that {{ =pronoun_sub[student.gender] }} is of good moral character and has never been subjected to any disciplinary action during {{ =pronoun_pos[student.gender] }} entire stay in this University.
         </p>
         <p style="text-indent: 45px">
-            Issued at {{=good_moral_certificate.date_issued}} for reference
-            purposes.
+            Issued at {{ =good_moral_certificate.date_issued }} for reference purposes.
         </p>
         <div class="staff">
-            {{ =registrar.name }} <br />
-            {{ =registrar.position }}
+            {{ =good_moral_certificate.registrar.name }} <br />
+            {{ =good_moral_certificate.registrar.position }}
         </div>
 
         <div class="u_registrar">
-            {{ =signatory1.name }} <br />
-            {{ =signatory1.position }}
+            {{ =good_moral_certificate.signatory1.name }} <br />
+            {{ =good_moral_certificate.signatory1.position }}
         </div>
 
         <div class="guidance">
-            {{ =signatory2.name }} <br />
-            {{ =signatory2.position }}
+            {{ =good_moral_certificate.signatory2.name }} <br />
+            {{ =good_moral_certificate.signatory2.position }}
         </div>
 
 
