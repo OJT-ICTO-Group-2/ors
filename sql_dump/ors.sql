@@ -502,6 +502,45 @@ ALTER SEQUENCE public.faculty_id_seq OWNED BY public.faculty.id;
 
 
 --
+-- Name: good_moral_certificate; Type: TABLE; Schema: public; Owner: anjelo
+--
+
+CREATE TABLE public.good_moral_certificate (
+    id integer NOT NULL,
+    student_id integer NOT NULL,
+    date_issued date,
+    registrar integer,
+    signatory1 integer,
+    signatory2 integer,
+    revision integer
+);
+
+
+ALTER TABLE public.good_moral_certificate OWNER TO anjelo;
+
+--
+-- Name: good_moral_certificate_id_seq; Type: SEQUENCE; Schema: public; Owner: anjelo
+--
+
+CREATE SEQUENCE public.good_moral_certificate_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.good_moral_certificate_id_seq OWNER TO anjelo;
+
+--
+-- Name: good_moral_certificate_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: anjelo
+--
+
+ALTER SEQUENCE public.good_moral_certificate_id_seq OWNED BY public.good_moral_certificate.id;
+
+
+--
 -- Name: grade; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -784,7 +823,8 @@ CREATE TABLE public.student (
     sem_admitted character varying(25) NOT NULL,
     date_graduated date,
     class_year character varying(9),
-    gender character varying(10)
+    gender character varying(10),
+    year_level character varying(3)
 );
 
 
@@ -943,6 +983,13 @@ ALTER TABLE ONLY public.enrollment_certificate ALTER COLUMN id SET DEFAULT nextv
 --
 
 ALTER TABLE ONLY public.faculty ALTER COLUMN id SET DEFAULT nextval('public.faculty_id_seq'::regclass);
+
+
+--
+-- Name: good_moral_certificate id; Type: DEFAULT; Schema: public; Owner: anjelo
+--
+
+ALTER TABLE ONLY public.good_moral_certificate ALTER COLUMN id SET DEFAULT nextval('public.good_moral_certificate_id_seq'::regclass);
 
 
 --
@@ -1205,6 +1252,7 @@ COPY public.course (id, code, title, units) FROM stdin;
 --
 
 COPY public.enrollment_certificate (id, student_id, registrar, date_issued, revision, term_sem, term_year) FROM stdin;
+1	1	1	2021-07-16	0	1	2020-2021
 \.
 
 
@@ -1219,6 +1267,15 @@ COPY public.faculty (id, name, "position", title) FROM stdin;
 4	Gabriel M. Abanes	Registrar II	
 5	Jocelyn E. Serrano	Dean	MSc
 6	Maria Bernadette A. Palacio	Dean	Ed.D
+\.
+
+
+--
+-- Data for Name: good_moral_certificate; Type: TABLE DATA; Schema: public; Owner: anjelo
+--
+
+COPY public.good_moral_certificate (id, student_id, date_issued, registrar, signatory1, signatory2, revision) FROM stdin;
+2	1	2021-07-15	1	2	2	0
 \.
 
 
@@ -1305,6 +1362,8 @@ COPY public.grade (id, student_id, course_id, term_sem, term_year, final_grade, 
 --
 
 COPY public.grades_certificate (id, student_id, date_issued, registrar, noted_by, revision) FROM stdin;
+3	1	2021-07-19	1	2	0
+4	2	2021-07-16	1	1	0
 \.
 
 
@@ -1377,10 +1436,10 @@ COPY public.staff (id, name, "position", title) FROM stdin;
 -- Data for Name: student; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.student (id, student_id, first_name, middle_name, last_name, address, birthdate, birthplace, program_id, specialization_id, last_attended, category, college_id, sem_admitted, date_graduated, class_year, gender) FROM stdin;
-1	2017-CS-100101	Perrie	Garcia	Diaz	Buraguis, Legazpi City	1998-04-23	Legazpi City, Albay	1	1	2021	College Graduate	1	1st Sem., 2017-2018	2021-05-16	\N	\N
-2	2018-CS-100102	Juan	Medina	Dela Cruz	Rizal Street, Legazpi City, Albay	1999-09-07	Legazpi City, Albay	6	2	2021	Undergraduate	1	1st Sem., 2018-2019	\N	\N	\N
-3	2016-CN-100234	Stephanie	Reyes	Barreto	Rizal Street, Legazpi City	1998-06-24	Legazpi City	7	\N	\N	College Graduate	3	1st Sem., 2016-2017	2020-05-18	2019-2020	\N
+COPY public.student (id, student_id, first_name, middle_name, last_name, address, birthdate, birthplace, program_id, specialization_id, last_attended, category, college_id, sem_admitted, date_graduated, class_year, gender, year_level) FROM stdin;
+1	2017-CS-100101	Perrie	Garcia	Diaz	Buraguis, Legazpi City	1998-04-23	Legazpi City, Albay	1	1	2021	College Graduate	1	1st Sem., 2017-2018	2021-05-16	\N	Female	3
+2	2018-CS-100102	Juan	Medina	Dela Cruz	Rizal Street, Legazpi City, Albay	1999-09-07	Legazpi City, Albay	6	2	2021	Undergraduate	1	1st Sem., 2018-2019	\N	\N	Male	3
+3	2016-CN-100234	Stephanie	Reyes	Barreto	Rizal Street, Legazpi City	1998-06-24	Legazpi City	7	\N	\N	College Graduate	3	1st Sem., 2016-2017	2020-05-18	2019-2020	Female	4
 \.
 
 
@@ -1475,7 +1534,7 @@ SELECT pg_catalog.setval('public.course_id_seq', 56, true);
 -- Name: enrollment_certificate_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.enrollment_certificate_id_seq', 1, false);
+SELECT pg_catalog.setval('public.enrollment_certificate_id_seq', 1, true);
 
 
 --
@@ -1483,6 +1542,13 @@ SELECT pg_catalog.setval('public.enrollment_certificate_id_seq', 1, false);
 --
 
 SELECT pg_catalog.setval('public.faculty_id_seq', 6, true);
+
+
+--
+-- Name: good_moral_certificate_id_seq; Type: SEQUENCE SET; Schema: public; Owner: anjelo
+--
+
+SELECT pg_catalog.setval('public.good_moral_certificate_id_seq', 2, true);
 
 
 --
@@ -1496,7 +1562,7 @@ SELECT pg_catalog.setval('public.grade_id_seq', 70, true);
 -- Name: grades_certificate_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.grades_certificate_id_seq', 1, false);
+SELECT pg_catalog.setval('public.grades_certificate_id_seq', 4, true);
 
 
 --
@@ -1674,6 +1740,14 @@ ALTER TABLE ONLY public.enrollment_certificate
 
 ALTER TABLE ONLY public.faculty
     ADD CONSTRAINT faculty_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: good_moral_certificate good_moral_certificate_pkey; Type: CONSTRAINT; Schema: public; Owner: anjelo
+--
+
+ALTER TABLE ONLY public.good_moral_certificate
+    ADD CONSTRAINT good_moral_certificate_pkey PRIMARY KEY (id);
 
 
 --
@@ -1874,6 +1948,38 @@ ALTER TABLE ONLY public.enrollment_certificate
 
 ALTER TABLE ONLY public.enrollment_certificate
     ADD CONSTRAINT enrollment_certificate_student_id_fkey FOREIGN KEY (student_id) REFERENCES public.student(id) ON DELETE CASCADE;
+
+
+--
+-- Name: good_moral_certificate good_moral_certificate_registrar_fkey; Type: FK CONSTRAINT; Schema: public; Owner: anjelo
+--
+
+ALTER TABLE ONLY public.good_moral_certificate
+    ADD CONSTRAINT good_moral_certificate_registrar_fkey FOREIGN KEY (registrar) REFERENCES public.staff(id) ON DELETE CASCADE;
+
+
+--
+-- Name: good_moral_certificate good_moral_certificate_signatory1_fkey; Type: FK CONSTRAINT; Schema: public; Owner: anjelo
+--
+
+ALTER TABLE ONLY public.good_moral_certificate
+    ADD CONSTRAINT good_moral_certificate_signatory1_fkey FOREIGN KEY (signatory1) REFERENCES public.staff(id) ON DELETE CASCADE;
+
+
+--
+-- Name: good_moral_certificate good_moral_certificate_signatory2_fkey; Type: FK CONSTRAINT; Schema: public; Owner: anjelo
+--
+
+ALTER TABLE ONLY public.good_moral_certificate
+    ADD CONSTRAINT good_moral_certificate_signatory2_fkey FOREIGN KEY (signatory2) REFERENCES public.staff(id) ON DELETE CASCADE;
+
+
+--
+-- Name: good_moral_certificate good_moral_certificate_student_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: anjelo
+--
+
+ALTER TABLE ONLY public.good_moral_certificate
+    ADD CONSTRAINT good_moral_certificate_student_id_fkey FOREIGN KEY (student_id) REFERENCES public.student(id) ON DELETE CASCADE;
 
 
 --
