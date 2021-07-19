@@ -12,6 +12,9 @@
             <th>Name</th>
             <th>Download TOR</th>
             <th>RLE Record</th>
+            <th>COG</th>
+            <th>Good Moral</th>
+            <th>Enrollment</th>
           </tr>
         </thead>
         <tbody>
@@ -42,6 +45,24 @@
               {{ else: }}
               Not available for this student
               {{ pass }}
+            </td>
+            <td>
+              <a href="{{=URL('grades_certificate', args=[student.student_id])}}">
+                View
+              </a>
+              <a href="{{=URL('grades_certificate', args=[student.student_id, "download"])}}">
+                Downlaod
+              </a>
+            </td>
+            <td>
+              <a href="{{=URL('good_moral_certificate', args=[student.student_id])}}">
+                View
+              </a>
+            </td>
+            <td>
+              <a href="{{=URL('enrollment_certificate', args=[student.student_id])}}">
+                View
+              </a>
             </td>
           </tr>
           {{ pass }}
