@@ -70,7 +70,7 @@ def tor_download():
     file_name = f'{student.last_name}-{student.first_name}-{student.middle_name}-TOR.xlsx'.replace(" ", "_")
 
     # load template file
-    wb = opx.load_workbook(filename='applications/ors/static/templates/TOR-template.xlsx')
+    wb = opx.load_workbook(filename='applications/ors/static/templates/TOR-Template.xlsx')
 
     # get current worksheet
     ws = wb.active
@@ -316,7 +316,7 @@ def rle_record():
         import openpyxl as opx
 
         # store the file name
-        file_name = f'{student.last_name}-{student.first_name}-{student.middle_name}-TOR.xlsx'.replace(" ", "_")
+        file_name = f'{student.last_name}-{student.first_name}-{student.middle_name}-RLE_Record.xlsx'.replace(" ", "_")
 
         # load template file
         wb = opx.load_workbook(filename='applications/ors/static/templates/RLE-Record-Template.xlsx')
@@ -493,7 +493,6 @@ def rle_record():
         response.headers['Content-disposition'] = f'attachment; filename={file_name}'
         response.stream(file)
 
-
 def enrollment_certificate():
     student_id = request.args(0)
     if not student_id:
@@ -528,3 +527,112 @@ def good_moral_certificate():
     day_issued = make_ordinal(good_moral_certificate.date_issued.strftime("%d"))
 
     return locals()
+
+def grades_certificate():
+    # get the student id
+    student_id = request.args(0)
+    if not student_id:
+        raise HTTP(400, "Bad request")
+
+    student = db(db.student.student_id==student_id).select().first()
+    college = db(db.college.id==student.college_id).select().first()
+    program = db(db.program.id==student.program_id).select().first()
+    grades = db(db.grade.student_id==student.id).select(
+        join=db.course.on(db.grade.course_id==db.course.id),
+        orderby=db.grade.term_year|db.grade.term_sem
+    )
+    college_registrar = db(student.id==db.grades_certificate.student_id).select().first()
+    registrar = college_registrar.registrar
+
+    terms = set()       # set of terms; terms are of type tuple: (term_sem, term_year); to be used as keys for term_data dictionary
+
+    # store to terms set all terms attended by student
+    for grade in grades:
+        terms.add((grade.grade.term_sem, grade.grade.term_year))
+
+    # sort the terms by school year
+    terms = sorted(terms, key=lambda tup: tup[0])
+    terms = sorted(terms, key=lambda tup: tup[1])
+
+    term_data = {}      # dictionary of grades data per term: {term: {"grades": [], "units": int, "equivalent": float}}
+    summary = {"units": 0, "equivalent": 0}     # summary data
+
+    # iterate over the terms
+    for term in terms:
+        term_data[term] = {"grades": [], "units": 0, "equivalent": 0}       # initialize the contents of term_data
+
+        # check for each grade and store to term_data[term] if matches the term
+        for grade in grades:
+            if grade.grade.term_sem == term[0] and grade.grade.term_year == term[1]:
+                term_data[term]["grades"].append(grade)
+                term_data[term]["units"] += grade.course.units
+
+
+        summary["units"] += term_data[term]["units"]
+
+    if not request.args(1):
+        return locals()
+
+    elif request.args(1) == "download":
+        # GENERATING THE XLSX FILE
+
+        from openpyxl import load_workbook
+        wb = load_workbook(filename='applications/ors/static/templates/COG-Template.xlsx')
+        file_name = f'{student.last_name}-{student.first_name}-{student.middle_name}-COG.xlsx'.replace(" ", "_")
+
+        sh1 = wb['Sheet1']
+        sh1.cell(row=6,column=4, value=f'{college.name}'.upper())
+        sh1.cell(row=7,column=4, value=college.address)
+        sh1.cell(row=8,column=4, value=college.contact_number)
+
+        sh1.cell(row=20, column=2, value='\tOn the basis of records on file in this office, I hereby certify that '+ student.first_name+ ', '+ student.middle_name + ' '+ student.last_name+ ', a '+ student.year_level+ ' '+program.name+' student of the college, took the following subjects with the corresponding grades and units, to wit:')
+        i = 25
+
+        for term in terms:
+
+            j = 2
+            grades = term_data[term]["grades"]
+
+            sh1.cell(row=i,column=j, value=f'{term[0]}')
+            sh1.cell(row=i+1,column=j, value=f'{term[1]}')
+            j = j+1
+
+            for grade in grades:
+
+                sh1.cell(row =i, column=j, value=f'{grade.course.code}')
+                j = j+1
+
+                sh1.cell(row =i, column=j, value=f'{grade.course.title}')
+                j = j+1
+
+                if grade.grade.final_grade != 4.0:
+                    sh1.cell(row =i, column=j, value=f'{grade.grade.final_grade}')
+                else:
+                    sh1.cell(row =i, column=j, value='INC')
+                j = j+1
+
+                if grade.grade.final_grade == 4.0:
+                    sh1.cell(row =i, column=j, value=f'{grade.grade.removal_rating}')
+                j = j+1
+
+                sh1.cell(row =i, column=j, value=f'{grade.course.units}')
+
+                j = 3
+                i = i+1
+
+
+        sh1.cell(row=41,column=2, value='\tIssued this ' +college_registrar.date_issued.strftime("%dsuffix day of %B, %Y").replace('suffix', str(suffix_generator(college_registrar.date_issued.day)) ) + ' for reference purposes.' )
+
+        sh1.cell(row =43, column=6, value=f'{registrar.name}'.upper())
+
+        file = f'applications/ors/documents/cog/{file_name}'
+        wb.save(filename=file)
+
+        # return the generated file as a response
+        from gluon.contenttype import contenttype
+        response.headers['Content-Type'] = contenttype('xlsx')
+        response.headers['Content-disposition'] = f'attachment; filename={file_name}'
+        response.stream(file)
+
+def suffix_generator(d):
+    return 'th' if 11<=d<=13 else {1:'st',2:'nd',3:'rd'}.get(d%10, 'th')
