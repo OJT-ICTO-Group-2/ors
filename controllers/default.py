@@ -510,7 +510,39 @@ def enrollment_certificate():
     suffix = {1: "st", 2: "nd", 3: "rd", 4: "th", 5: "th", 6: "th"}
     day_issued = make_ordinal(enrollment_certificate.date_issued.strftime("%d"))
 
-    return locals()
+    if not request.args(1):
+        return locals()
+
+    elif request.args(1) == "download":
+        # GENERATING THE XLSX FILE
+
+        from openpyxl import load_workbook
+        wb = load_workbook(filename='static/templates/enrollment_certificate-template.xlsx')
+        file_name = f'{student.last_name}-{student.first_name}-{student.middle_name}-enrollment_certificate.xlsx'.replace(" ", "_")
+
+        sh1 = wb['Sheet1']
+        sh1.cell(row=5,column=4, value='Republic of the Philippines')
+        sh1.cell(row=6,column=4, value='Bicol University')
+        sh1.cell(row=7,column=4, value=f'{college.name}')
+        sh1.cell(row=8,column=4, value=college.address)
+        sh1.cell(row=9,column=4, value=college.contact_number)
+
+        sh1.cell(row=20, column=2, value='\tThis is to certify that ' + honorific[student.gender]+ student.first_name+ ', '+ student.middle_name + ' '+ student.last_name+ ' a bona fied '+ student.year_level+ ' '+program.name+ specialization_id.name +
+        ' student of this college and is officially enrolled this' + ' ' + enrollment_certificate.term_sem + suffix[int(enrollment_certificate.term_sem)] + 'Semester' +enrollment_certificate.term_year )
+
+        sh1.cell(row=29,column=2, value='\tIssued this ' + enrollment_certificate.date_issued.strftime("%dsuffix day of %B, %Y").replace('suffix', str(suffix_generator(college_registrar.date_issued.day)) ) + ' for reference purposes.' )
+
+        sh1.cell(row =23, column=6, value=f'{registrar.name}'.upper())
+        sh1.cell(row =33, column=6, value=f'{registrar.position}')
+
+        file = f'applications/ors/documents/enrollment_certificate/{file_name}'
+        wb.save(filename=file)
+
+        # return the generated file as a response
+        from gluon.contenttype import contenttype
+        response.headers['Content-Type'] = contenttype('xlsx')
+        response.headers['Content-disposition'] = f'attachment; filename={file_name}'
+        response.stream(file)
 
 def good_moral_certificate():
     student_id = request.args(0)
