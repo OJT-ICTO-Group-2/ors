@@ -551,7 +551,6 @@ def enrollment_certificate():
         response.headers['Content-disposition'] = f'attachment; filename={file_name}'
         response.stream(file)
 
-
 def good_moral_certificate():
     student_id = request.args(0)
     if not student_id:
