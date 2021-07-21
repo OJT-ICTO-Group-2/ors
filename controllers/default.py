@@ -566,9 +566,55 @@ def good_moral_certificate():
     registrar = db(db.staff.id).select().first()   
     day_issued = make_ordinal(good_moral_certificate.date_issued.strftime("%d"))
 
-    return locals()
+    if not request.args(1):
+        return locals()
+    elif request.args(1) == "download":
+        # script for generating xlsx file of TOR
+        import openpyxl as opx
+
+        from openpyxl import load_workbook
+        from openpyxl.styles import Font
+        wb = load_workbook(filename='applications/ors/static/templates/Good-Moral-Certificate-Template.xlsx')
+        file_name = f'{student.last_name}-{student.first_name}-{student.middle_name}-Good-Moral_Certificate.xlsx'.replace(" ", "_")
+
+        sh1 = wb['Sheet1']
+        b = Font(bold=True)
+        # fsize = Font(size=15)
+        sh1.cell(row=4, column=4, value='Republic of the Philippines')
+        sh1.cell(row=5, column=4, value='Bicol University')
+        sh1.cell(row=6, column=4, value=student.college_id.name)
+        sh1.cell(row=7, column=4, value=student.college_id.address)
+        sh1.cell(row=7, column=4, value='Tel. No. 'f'{student.college_id.contact_number}')
+        sh1.cell(row=6, column=4).font = b
+
+        sh1.cell(row=20, column=2, value='\tThis is to certify that ' + honorific[student.gender]+ ' ' + student.first_name+ ', '+ student.middle_name + ' '+ student.last_name+ ' is a '+ student.year_level+ ' '+student.program_id.name+ ' major in ' + student.specialization_id.name +
+        ' student of this College. ')
+        sh1.cell(row=20, column=2).font = b
+
+        sh1.cell(row=25, column=2, value='It is further certified that she is of good moral character and has never been subjected to any disciplinary action during her entire stay in this University.')
+
+        sh1.cell(row=29, column=2, value='\tIssued this ' + good_moral_certificate.date_issued.strftime("%dsuffix day of %B, %Y").replace('suffix', str(suffix_generator(good_moral_certificate.date_issued.day)) ) + ' upon request of ' + honorific[student.gender]+ ' '+ student.last_name+ ' for  reference purposes.' )
+
+        sh1.cell(row=29, column=6, value=f'{registrar.name}'.upper())
+        sh1.cell(row=29, column=6).font = b
+        sh1.cell(row=30, column=6, value=f'{registrar.position}')
+
+        sh1.cell(row=33, column=6, value=f'{registrar.name}'.upper())
+        sh1.cell(row=33, column=6).font = b
+        sh1.cell(row=34, column=6, value=f'{registrar.position}')
 
 
+        sh1.cell(row=39, column=8, value='Revision:'f'{good_moral_certificate.revision}')
+
+        file = f'applications/ors/documents/good-moral-certificate/{file_name}'
+        wb.save(filename=file)
+
+        # return the generated file as a response
+        from gluon.contenttype import contenttype
+        response.headers['Content-Type'] = contenttype('xlsx')
+        response.headers['Content-disposition'] = f'attachment; filename={file_name}'
+        response.stream(file)
+        
 def grades_certificate():
     # get the student id
     student_id = request.args(0)
