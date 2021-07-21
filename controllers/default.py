@@ -518,31 +518,31 @@ def enrollment_certificate():
 
         from openpyxl import load_workbook
         from openpyxl.styles import Font
-        wb = load_workbook(filename='applications/page10/static/templates/enrollment_certificate-template.xlsx')
-        file_name = f'{student.last_name}-{student.first_name}-{student.middle_name}-enrollment_certificate.xlsx'.replace(" ", "_")
-        
+        wb = load_workbook(filename='applications/ors/static/templates/Enrollment-Certificate-Template.xlsx')
+        file_name = f'{student.last_name}-{student.first_name}-{student.middle_name}-Enrollment_Certificate.xlsx'.replace(" ", "_")
+
         sh1 = wb['Sheet1']
         b = Font(bold=True)
         # fsize = Font(size=15)
-        sh1.cell(row=4,column=4, value='Republic of the Philippines')
-        sh1.cell(row=5,column=4, value='Bicol University')
-        sh1.cell(row=6,column=4, value=f'{college.name}')
-        sh1.cell(row=7,column=4, value=college.address)
-        sh1.cell(row=7,column=4, value='Tel. No. 'f'{college.contact_number}')
-        sh1.cell(row=6,column=4).font = b
+        sh1.cell(row=4, column=4, value='Republic of the Philippines')
+        sh1.cell(row=5, column=4, value='Bicol University')
+        sh1.cell(row=6, column=4, value=student.college_id.name)
+        sh1.cell(row=7, column=4, value=student.college_id.address)
+        sh1.cell(row=7, column=4, value='Tel. No. 'f'{student.college_id.contact_number}')
+        sh1.cell(row=6, column=4).font = b
 
-        sh1.cell(row=20, column=2, value='\tThis is to certify that ' + honorific[student.gender]+ ' ' + student.first_name+ ', '+ student.middle_name + ' '+ student.last_name+ ' a bona fied '+ student.year_level+ ' '+program.name+ ' major in ' + specialization.name +
+        sh1.cell(row=20, column=2, value='\tThis is to certify that ' + honorific[student.gender]+ ' ' + student.first_name+ ', '+ student.middle_name + ' '+ student.last_name+ ' a bona fied '+ student.year_level+ ' '+student.program_id.name+ ' major in ' + student.specialization_id.name +
         ' student of this college and is officially enrolled this' + ' ' + enrollment_certificate.term_sem  + ' Semester School Year ' +enrollment_certificate.term_year )
         sh1.cell(row=20, column=2).font = b
-        sh1.cell(row=25,column=2, value='\tIssued this ' + enrollment_certificate.date_issued.strftime("%dsuffix day of %B, %Y").replace('suffix', str(suffix_generator(enrollment_certificate.date_issued.day)) ) + ' for reference purposes.' )
+        sh1.cell(row=25, column=2, value='\tIssued this ' + enrollment_certificate.date_issued.strftime("%dsuffix day of %B, %Y").replace('suffix', str(suffix_generator(enrollment_certificate.date_issued.day)) ) + ' for reference purposes.' )
 
-        sh1.cell(row =29, column=6, value=f'{registrar.name}'.upper())
-        sh1.cell(row =29, column=6).font = b
-        sh1.cell(row =30, column=6, value=f'{registrar.position}')
-        
-        sh1.cell(row =39, column=8, value='Revision:'f'{enrollment_certificate.revision}')
+        sh1.cell(row=29, column=6, value=f'{registrar.name}'.upper())
+        sh1.cell(row=29, column=6).font = b
+        sh1.cell(row=30, column=6, value=f'{registrar.position}')
 
-        file = f'applications/page10/static/documents/enrollment_certificate/{file_name}'
+        sh1.cell(row=39, column=8, value='Revision:'f'{enrollment_certificate.revision}')
+
+        file = f'applications/ors/documents/enrollment-certificate/{file_name}'
         wb.save(filename=file)
 
         # return the generated file as a response

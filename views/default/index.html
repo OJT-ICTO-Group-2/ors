@@ -5,7 +5,7 @@
     <title>Students List</title>
   </head>
   <body>
-      <table>
+      <table style="width: 100%">
         <thead>
           <tr>
             <th>No.</th>
@@ -51,7 +51,7 @@
                 View
               </a>
               <a href="{{=URL('grades_certificate', args=[student.student_id, "download"])}}">
-                Downlaod
+                Download
               </a>
             </td>
             <td>
@@ -62,6 +62,9 @@
             <td>
               <a href="{{=URL('enrollment_certificate', args=[student.student_id])}}">
                 View
+              </a>
+              <a href="{{=URL('enrollment_certificate', args=[student.student_id, "download"])}}">
+                Download
               </a>
             </td>
           </tr>
