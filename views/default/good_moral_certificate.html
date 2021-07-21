@@ -30,31 +30,29 @@
              <b>{{ =honorific[student.gender] }} {{=student.last_name}}</b> 
              for reference purposes.
 
-        <br>
-        <br>
         <div class="staff">
-        <div class="font-bold text-center"><br>LORENA A. ARISPE<br></div>
+        <div class="font-bold text-center"><b>LORENA A. ARISPE</b><br></div>
                 <div class="text-center">Registrar II</div>
             </div>
 
-        <div class="w-1/3 pt-20">
-                <div class="font-bold text-center"><br>LINDA B. CAMPOPOS, Ed.D<br></div>
+        <div class="staff2">
+                <div class="font-bold text-center"><br><b>LINDA B. CAMPOPOS, Ed.D</b><br></div>
                 <div class="text-center">Guidance Coordinator</div>
             </div>
 
-        <div class="w-1/3 pt-20">
-                <div class="font-bold text-center"><br>DELIA B. ROCHA, Ed.D<br></div>
+       <div class="staff3">
+                <div class="font-bold text-center"><br><br><b>DELIA B. ROCHA, Ed.D</b><br></div>
                 <div class="text-center">Coordinator, Student Activities</div>
                 <div class="text-center">Adviser, College Student Council</div>
             </div>
         
         <br>
-        <div class="w-1/3 pt-20">
-                <span class="font-bold">NOTED:<br></span>
-                <div class="font-bold text-center"><br>CORAZON N. BAZAR<br></div>
-                <div class="text-center">University Registrar</div>
+        
+        <div class="u_reg">
+          <br><br><br><span class="font-bold">NOTED:</span>
+                <div class="text-center"><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<b>CORAZON N. BAZAR</b><br></div>
+                <div class="text-center">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspUniversity Registrar</div>
             </div>
-
         <footer>
             <div class="revision">
                 Revision: {{ =good_moral_certificate.revision }}
@@ -85,9 +83,31 @@
     float: right;
     text-align: center;
     margin-right: 80px;
-    margin-top: 100px;
+    margin-top: 50px;
 }
 
+.staff2{
+    font-size: 18px;
+    float: left;
+    text-align: center;
+    margin-right: 100px;
+    margin-top: 112px;
+}
+
+.staff3{
+    font-size: 18px;
+    float: right;
+    text-align: center;
+    margin-right: 40px;
+    margin-top: 0px;
+}
+
+.u_reg {
+    font-size: 18px;
+    float: left;
+    margin-right: 0px;
+    margin-top: 0px; 
+}
 footer{
     font-weight: 500;
     font-size: 12px;
@@ -95,6 +115,14 @@ footer{
     font-family: 'Berlin Sans FB';
 }
 
+
+.w-1/3 pt-20{
+    font-size: 18px;
+    float: left;
+    text-align: center;
+    margin-right: 100px;
+    margin-top: 200px;
+}
 .revision{
     float: right;
 }
