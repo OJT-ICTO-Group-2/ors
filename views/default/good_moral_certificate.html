@@ -6,59 +6,54 @@
         <title>Page_11</title>
     </head>
     <body>
-        <div class="center">
-          Republic of the Philippines <br />
-          Bicol University <br />
-          <!--get from db till tel no-->
-          {{ =student.college_id.name }}<br />
-          {{ =student.college_id.address}}<br />
-          {{ if student.college_id.contact_number: }}
-          Tel. No. {{ =student.college_id.contact_number }}
-          {{ pass }}
-        </div>
-        <p>
-            CERTIFICATION
-        </p>
 
-        <p style="font-weight: bold; margin-top: 35px; margin-bottom: 35px">
-            TO WHOM IT MAY CONCERN:
-        </p>
-        <p class="body" style="text-indent: 45px">
-            This is to certify that
-            <b>
-              {{ =honorific[student.gender] }}
-              {{ =student.first_name}}
-              {{ =student.middle_name[0] }}.
-              {{ =student.last_name}}
-            </b>
-            is a bona fied {{ =f'{student.year_level}{suffix[int(student.year_level)]}' }} Year {{ =student.program_id.name }} ({{
-            =student.program_id.abbreviation }}){{ if student.specialization_id: }}, major in {{ =student.specialization_id.name }}
-            {{ pass }}
-            student of this college. <br>
-        </p>
+    <header style="text-align:center">Republic of the Philippines<br>Bicol University<br>
+    Legazpi City <br> College of Science </header>
+    <p style="text-align: center; letter-spacing: 5px; font-weight: bold; font-size: 24px;">CERTIFICATION </p> <br><br>
 
-        <p style="text-indent: 45px">
-            It is further certified that {{ =pronoun_sub[student.gender] }} is of good moral character and has never been subjected to any disciplinary action during {{ =pronoun_pos[student.gender] }} entire stay in this University.
-        </p>
-        <p style="text-indent: 45px">
-          Issued this {{ =day_issued }} day of {{ =good_moral_certificate.date_issued.strftime("%B, %Y") }} for reference
-          purposes.
-        </p>
+     <p style="font-weight: bold;">TO WHOM IT MAY CONCERN:</p>
+
+    <p style="text-indent: 45px;">This is to certify that 
+            
+
+         <b>
+             {{ =honorific[student.gender] }} {{ =good_moral_certificate.registrar.name }} 
+        </b>
+             is a <b> 3rd Year </b>
+        <b>{{ =program.name }} ({{
+            =program.abbreviation }}) </b>
+             major in, {{ =program.name }} student of this College.
+        <p style="text-indent: 45px;">It is further ceretified that <b> she </b> is of good moral character and has never been subjected to any disciplinary action during <b>her </b> entire stay in this University.
+
+        <p style="text-indent: 45px;">Issued this day of {{ =day_issued }} day of <b> {{ =good_moral_certificate.date_issued.strftime("%B, %Y") }} </b>
+            upon the request of 
+             <b>{{ =honorific[student.gender] }} {{=student.last_name}}</b> 
+             for reference purposes.
+
+        <br>
+        <br>
         <div class="staff">
-            {{ =good_moral_certificate.registrar.name }} <br />
-            {{ =good_moral_certificate.registrar.position }}
-        </div>
+        <div class="font-bold text-center"><br>LORENA A. ARISPE<br></div>
+                <div class="text-center">Registrar II</div>
+            </div>
 
-        <div class="u_registrar">
-            {{ =good_moral_certificate.signatory1.name }} <br />
-            {{ =good_moral_certificate.signatory1.position }}
-        </div>
+        <div class="w-1/3 pt-20">
+                <div class="font-bold text-center"><br>LINDA B. CAMPOPOS, Ed.D<br></div>
+                <div class="text-center">Guidance Coordinator</div>
+            </div>
 
-        <div class="guidance">
-            {{ =good_moral_certificate.signatory2.name }} <br />
-            {{ =good_moral_certificate.signatory2.position }}
-        </div>
-
+        <div class="w-1/3 pt-20">
+                <div class="font-bold text-center"><br>DELIA B. ROCHA, Ed.D<br></div>
+                <div class="text-center">Coordinator, Student Activities</div>
+                <div class="text-center">Adviser, College Student Council</div>
+            </div>
+        
+        <br>
+        <div class="w-1/3 pt-20">
+                <span class="font-bold">NOTED:<br></span>
+                <div class="font-bold text-center"><br>CORAZON N. BAZAR<br></div>
+                <div class="text-center">University Registrar</div>
+            </div>
 
         <footer>
             <div class="revision">
@@ -72,53 +67,36 @@
 </html>
 
 <style type="text/css">
-    body {
-        font-size: 17px;
-        font-family: "Times New Roman";
-        color: black;
-        margin-left: 300px;
-        margin-right: 300px;
-        padding: 50px;
-        padding-left: 70px;
-        padding-right: 40px;
-        border: 1px solid black;
-        text-align: justify;
-    }
+     body{
+    font-size: 17px;
+    font-family: 'Times New Roman';
+    color: black;
+    margin-left: 300px;
+    margin-right: 300px;
+    padding: 50px;
+    padding-left: 70px;
+    padding-right: 40px;
+    border: 1px solid black;
+    text-align: justify;
+}
 
-    .staff {
-        float: right;
-        text-align: center;
-        margin-right: 80px;
-        margin-top: 100px;
-    }
+.staff{
+    font-size: 18px;
+    float: right;
+    text-align: center;
+    margin-right: 80px;
+    margin-top: 100px;
+}
 
-    .u_registrar {
-        text-align: center;
-        margin-right: 80px;
-        margin-top: 100px;
-    }
+footer{
+    font-weight: 500;
+    font-size: 12px;
+    margin-top: 400px;
+    font-family: 'Berlin Sans FB';
+}
 
-    .guidance {
-        text-align: center;
-        margin-right: 80px;
-        margin-top: 100px;
-    }
+.revision{
+    float: right;
+}
 
-    footer {
-        font-weight: 500;
-        font-size: 12px;
-        margin-top: 400px;
-        font-family: "Berlin Sans FB";
-    }
-
-    .revision {
-        float: right;
-    }
-
-    .center {
-        margin-top: 10px;
-        text-align: center;
-        font-weight: bold;
-        margin-bottom: 20px;
-    }
-</style>
+    </style>
