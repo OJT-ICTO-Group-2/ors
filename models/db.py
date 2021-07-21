@@ -142,7 +142,5 @@ db.define_table(
     Field("student_id", 'reference student', notnull=True),
     Field("date_issued", type='date', default = request.now, requires = IS_DATE(format=('%d-%m-%Y'))),
     Field("registrar", 'reference staff'),
-    Field("signatory1", 'reference staff'),
-    Field("signatory2", 'reference staff'),
     Field("revision", type='integer', default=0)
 )
