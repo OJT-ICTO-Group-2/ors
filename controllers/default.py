@@ -559,14 +559,16 @@ def good_moral_certificate():
 
     student = db(db.student.student_id == student_id).select().first()
     good_moral_certificate = db(db.good_moral_certificate.student_id == student.id).select().first()
-
+    program = db(db.program.id == student.program_id).select().first()
     honorific = {"Male": "Mr.", "Female": "Ms."}
     suffix = {1: "st", 2: "nd", 3: "rd", 4: "th", 5: "th", 6: "th"}
     pronoun_sub = {"Male": "he", "Female": "she"}
     pronoun_pos = {"Male": "his", "Female": "her"}
+    registrar = db(db.staff.id).select().first()   
     day_issued = make_ordinal(good_moral_certificate.date_issued.strftime("%d"))
 
     return locals()
+
 
 def grades_certificate():
     # get the student id
