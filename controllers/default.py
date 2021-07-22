@@ -599,10 +599,14 @@ def good_moral_certificate():
         sh1.cell(row=29, column=6).font = b
         sh1.cell(row=30, column=6, value=f'{registrar.position}')
 
-        sh1.cell(row=33, column=6, value=f'{registrar.name}'.upper())
+        sh1.cell(row=33, column=1, value=f'LINDA B.CAMPOPOS, Ed.D'.upper())
+        sh1.cell(row=33, column=1).font = b
+        sh1.cell(row=34, column=1, value=f'Guidance Coordinator'.upper())
+        
+        sh1.cell(row=33, column=6, value=f'DELIA B. ROCHA, Ed.D'.upper())
         sh1.cell(row=33, column=6).font = b
-        sh1.cell(row=34, column=6, value=f'{registrar.position}')
-
+        sh1.cell(row=34, column=6, value=f'Coordinator, Student Activities'.upper())
+        sh1.cell(row=35, column=6, value=f'Adviser, College Student Council'.upper())
 
         sh1.cell(row=39, column=8, value='Revision:'f'{good_moral_certificate.revision}')
 
