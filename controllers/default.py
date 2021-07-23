@@ -564,8 +564,8 @@ def good_moral_certificate():
     pronoun_sub = {"Male": "he", "Female": "she"}
     pronoun_pos = {"Male": "his", "Female": "her"}
     registrar = db(db.staff.id).select().first()
-    signatory1 = db(db.staff.id).select().first()
-    signatory2 = db(db.staff.id).select().first()
+    good_moral_certificate.signatory1
+    good_moral_certificate.signatory2 
     day_issued = make_ordinal(good_moral_certificate.date_issued.strftime("%d"))
 
     if student.specialization_id:
