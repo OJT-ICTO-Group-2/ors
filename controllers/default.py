@@ -563,16 +563,16 @@ def good_moral_certificate():
     suffix = {1: "st", 2: "nd", 3: "rd", 4: "th", 5: "th", 6: "th"}
     pronoun_sub = {"Male": "he", "Female": "she"}
     pronoun_pos = {"Male": "his", "Female": "her"}
-    registrar = db(db.staff.id).select().first()   
+    registrar = db(db.staff.id).select().first()
     signatory1 = db(db.staff.id).select().first()
     signatory2 = db(db.staff.id).select().first()
     day_issued = make_ordinal(good_moral_certificate.date_issued.strftime("%d"))
 
-     if student.specialization_id:
+    if student.specialization_id:
         specialization = db(db.specialization.id == student.specialization_id).select().first()
     else:
         specialization = None
-        
+
     if not request.args(1):
         return locals()
     elif request.args(1) == "download":
@@ -609,7 +609,7 @@ def good_moral_certificate():
         sh1.cell(row=33, column=1, value=f'LINDA B.CAMPOPOS, Ed.D'.upper())
         sh1.cell(row=33, column=1).font = b
         sh1.cell(row=34, column=1, value=f'Guidance Coordinator'.upper())
-        
+
         sh1.cell(row=33, column=6, value=f'DELIA B. ROCHA, Ed.D'.upper())
         sh1.cell(row=33, column=6).font = b
         sh1.cell(row=34, column=6, value=f'Coordinator, Student Activities'.upper())
@@ -625,7 +625,7 @@ def good_moral_certificate():
         response.headers['Content-Type'] = contenttype('xlsx')
         response.headers['Content-disposition'] = f'attachment; filename={file_name}'
         response.stream(file)
-        
+
 def grades_certificate():
     # get the student id
     student_id = request.args(0)
