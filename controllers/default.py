@@ -555,17 +555,17 @@ def good_moral_certificate():
     student_id = request.args(0)
     if not student_id:
         raise HTTP(400, "Bad request")
-
     student = db(db.student.student_id == student_id).select().first()
-    good_moral_certificate = db(db.good_moral_certificate.student_id == student.id).select().first()
+    good_moral_certificate = db(db.good_moral_certificate.id == student.id).select().first()
+    
     program = db(db.program.id == student.program_id).select().first()
     honorific = {"Male": "Mr.", "Female": "Ms."}
     suffix = {1: "st", 2: "nd", 3: "rd", 4: "th", 5: "th", 6: "th"}
     pronoun_sub = {"Male": "he", "Female": "she"}
     pronoun_pos = {"Male": "his", "Female": "her"}
     registrar = db(db.staff.id).select().first()
-    good_moral_certificate.signatory1
-    good_moral_certificate.signatory2 
+    signatory1 = db(db.staff.id).select().first()
+    signatory2 = db(db.staff.id).select().first()
     day_issued = make_ordinal(good_moral_certificate.date_issued.strftime("%d"))
 
     if student.specialization_id:
@@ -577,11 +577,10 @@ def good_moral_certificate():
         return locals()
     elif request.args(1) == "download":
         # script for generating xlsx file of TOR
-        import openpyxl as opx
 
         from openpyxl import load_workbook
         from openpyxl.styles import Font
-        wb = load_workbook(filename='applications/ors/static/templates/Good-Moral-Certificate-Template.xlsx')
+        wb = load_workbook(filename='applications/ors/static/template/Good-Moral-Certificate-Template.xlsx')
         file_name = f'{student.last_name}-{student.first_name}-{student.middle_name}-Good-Moral_Certificate.xlsx'.replace(" ", "_")
 
         sh1 = wb['Sheet1']
@@ -602,18 +601,17 @@ def good_moral_certificate():
 
         sh1.cell(row=29, column=2, value='\tIssued this ' + good_moral_certificate.date_issued.strftime("%dsuffix day of %B, %Y").replace('suffix', str(suffix_generator(good_moral_certificate.date_issued.day)) ) + ' upon request of ' + honorific[student.gender]+ ' '+ student.last_name+ ' for  reference purposes.' )
 
-        sh1.cell(row=29, column=6, value=f'{registrar.name}'.upper())
-        sh1.cell(row=29, column=6).font = b
-        sh1.cell(row=30, column=6, value=f'{registrar.position}')
+        sh1.cell(row=33, column=14, value=f'{registrar.name}'.upper())
+        sh1.cell(row=33, column=14).font = b
+        sh1.cell(row=34, column=14, value=f'{registrar.position}')
 
-        sh1.cell(row=33, column=1, value=f'LINDA B.CAMPOPOS, Ed.D'.upper())
-        sh1.cell(row=33, column=1).font = b
-        sh1.cell(row=34, column=1, value=f'Guidance Coordinator'.upper())
-
-        sh1.cell(row=33, column=6, value=f'DELIA B. ROCHA, Ed.D'.upper())
-        sh1.cell(row=33, column=6).font = b
-        sh1.cell(row=34, column=6, value=f'Coordinator, Student Activities'.upper())
-        sh1.cell(row=35, column=6, value=f'Adviser, College Student Council'.upper())
+        sh1.cell(row=37, column=2, value=f'{signatory1.name}'.upper())
+        sh1.cell(row=37, column=2).font = b
+        sh1.cell(row=38, column=2, value=f'{signatory1.position}'.upper())
+        
+        sh1.cell(row=37, column=14, value=f'{signatory2.name}'.upper())
+        sh1.cell(row=37, column=14).font = b
+        sh1.cell(row=38, column=14, value=f'{signatory2.position}'.upper())
 
         sh1.cell(row=39, column=8, value='Revision:'f'{good_moral_certificate.revision}')
 
