@@ -580,7 +580,7 @@ def good_moral_certificate():
 
         from openpyxl import load_workbook
         from openpyxl.styles import Font
-        wb = load_workbook(filename='applications/ors/static/template/Good-Moral-Certificate-Template.xlsx')
+        wb = load_workbook(filename='applications/ors/static/templates/Good-Moral-Certificate-Template.xlsx')
         file_name = f'{student.last_name}-{student.first_name}-{student.middle_name}-Good-Moral_Certificate.xlsx'.replace(" ", "_")
 
         sh1 = wb['Sheet1']
