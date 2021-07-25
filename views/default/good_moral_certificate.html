@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <!-- <link rel="stylesheet" href="/static/css/style.css" /> -->
-       
+
     </head>
     <body>
 
@@ -13,28 +13,28 @@
 
      <p style="font-weight: bold;">TO WHOM IT MAY CONCERN:</p>
 
-    <p style="text-indent: 45px;">This is to certify that 
+    <p style="text-indent: 45px;">This is to certify that
 
          <b>
-             {{ =honorific[student.gender] }} {{ =student.first_name }} 
+             {{ =honorific[student.gender] }} {{ =student.first_name }} {{ =student.middle_name[0] }}. {{ =student.last_name }}
         </b>
-             is a <b> {{ =f'{student.year_level}{suffix[int(student.year_level)]}' }} Year {{ 
+             is a <b> {{ =f'{student.year_level}{suffix[int(student.year_level)]}' }} Year {{
  =student.program_id.name }} ({{
             =student.program_id.abbreviation }}){{ if student.specialization_id: }}, major in {{ =student.specialization_id.name }}
             {{ pass }}  </b>
             student of this College.
-        <p style="text-indent: 45px;">It is further ceretified that <b> she </b> is of good moral character and has never been subjected to any disciplinary action during <b>her </b> entire stay in this University.
+        <p style="text-indent: 45px;">It is further ceretified that she is of good moral character and has never been subjected to any disciplinary action during her entire stay in this University.
 
-        <p style="text-indent: 45px;">Issued this <b> {{ =day_issued }} day of {{ =good_moral_certificate.date_issued.strftime("%B, %Y") }} </b>
-            upon the request of 
-             <b>{{ =honorific[student.gender] }} {{=student.last_name}}</b> 
+        <p style="text-indent: 45px;">Issued this {{ =day_issued }} day of {{ =good_moral_certificate.date_issued.strftime("%B, %Y") }}
+            upon the request of
+             <b>{{ =honorific[student.gender] }} {{=student.last_name}}</b>
              for reference purposes.
         <br>
         <br>
         <br>
         <p style="float: right;"> <b>{{=f'{good_moral_certificate.registrar.name.upper()}' }}</b>
         <br>{{=f'{good_moral_certificate.registrar.position}' }}</p>
-        
+
         <br>
         <br>
         <br>
@@ -50,7 +50,7 @@
         <p style="text-indent: 90px; line-height: 0.20"><b>{{ =f'{good_moral_certificate.registrar.name.upper()}'}}</b>
         <p style="text-indent: 90px; line-height: 0.20 ">{{ =f'{good_moral_certificate.registrar.position}' }}</p>
         </div>
-        
+
         <footer>
             <div class="revision">
                 Revision: {{ =good_moral_certificate.revision }}
