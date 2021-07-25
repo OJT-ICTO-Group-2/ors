@@ -38,3 +38,4 @@ pip-log.txt
 modules
 **/.~*
 static/sample_data
+.vscode
