@@ -150,7 +150,7 @@ db.define_table(
     'EAMOI_Cert',
     Field("student_id", 'reference student', notnull=True),
     Field("date_issued", type='date', default = request.now, requires = IS_DATE(format=('%d-%m-%Y'))),
-    Field("ref_no", type='integer', length=5),
+    Field("ref_no", type='integer', length=20),
     Field("series_no", type='integer', length=5),
     Field("registrar", 'reference staff', notnull=True),
     Field("revision", type='integer', default=0),
