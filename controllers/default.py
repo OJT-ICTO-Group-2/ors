@@ -729,6 +729,103 @@ def grades_certificate():
         response.headers['Content-Type'] = contenttype('xlsx')
         response.headers['Content-disposition'] = f'attachment; filename={file_name}'
         response.stream(file)
+        
+def EAMOI_Certification():
+    student_id = request.args(0)
+    if not student_id:
+        raise HTTP(400, "Bad request")
+        return
+
+    #  get data of student from database
+    student = db(db.student.student_id == student_id).select().first()
+    EAMOI_Cert = db(db.EAMOI_Cert.id == student.id).select().first()
+    college = db(db.college.id == student.college_id).select().first()
+    program = db(db.program.id == student.program_id).select().first()
+    
+     
+    registrar = db(db.staff.id).select().first()     
+    revision = db(db.EAMOI_Cert.revision).select().first()
+
+
+    honorific = {"Male": "Mr.", "Female": "Ms."}
+    suffix = {1: "st", 2: "nd", 3: "rd", 4: "th", 5: "th", 6: "th"}
+    day_issued = make_ordinal(EAMOI_Cert.date_issued.strftime("%d"))
+
+
+    if not request.args(1):
+        return locals()
+    elif request.args(1) == "download":
+
+        # script for generating xlsx file of eamoi certificate
+        import openpyxl as opx
+
+        from openpyxl import load_workbook
+        from openpyxl.styles import Alignment,Font
+        wb = load_workbook(filename='applications/ors/static/templates/eamoi-certification.xlsx')
+        file_name = f'{student.last_name}-{student.first_name}-{student.middle_name}-EAMOI_Certification.xlsx'.replace(" ", "_")
+
+        sheet = wb.active
+
+        e1 = sheet.cell(row = 1, column = 5)
+        e1.alignment = Alignment(horizontal='center')
+        e2 = sheet.cell(row = 2, column = 5)
+        e2.alignment = Alignment(horizontal='center')
+        e3 = sheet.cell(row = 3, column = 5)
+        e3.alignment = Alignment(horizontal='center')
+        e4 = sheet.cell(row = 4, column = 5)
+        e4.alignment = Alignment(horizontal='center')
+        e5 = sheet.cell(row = 5, column = 5)
+        e5.alignment = Alignment(horizontal='center')
+        e6 = sheet.cell(row = 6, column = 5)
+        e6.alignment = Alignment(horizontal='center')
+        e10 = sheet.cell(row = 10, column = 5)
+        e10.alignment = Alignment(horizontal='center')
+        e10.font = Font(size = 22, bold = True)
+        b14 = sheet.cell(row = 14, column = 2)
+        b16 = sheet.cell(row = 16, column = 2)
+        b16.alignment = Alignment(indent = 5)
+        b18 = sheet.cell(row = 18, column = 2)
+        b18.alignment = Alignment(indent = 5)
+        b20 = sheet.cell(row = 20, column = 2)
+        b20.alignment = Alignment(indent = 5)
+        g25 = sheet.cell(row = 25, column = 7)
+        g25.alignment = Alignment(horizontal='center')
+        g26 = sheet.cell(row = 26, column = 7)
+        g26.alignment = Alignment(horizontal='center')
+        g36 = sheet.cell(row = 36, column = 8)
+        g36.font = Font(name = 'Berlin Sans FB',size = 9, bold = True)
+        a36 = sheet.cell(row = 36, column = 1)
+        a36.font = Font(name = 'Berlin Sans FB',size =9, bold = True)
+        g37 = sheet.cell(row = 37, column = 1)
+        g37.font = Font(name = 'Berlin Sans FB',size = 9, bold = True)
+
+  
+        # writing values to cells
+        e1.value = "Republic of the Philippines"
+        e2.value = "Bicol University"
+        e3.value = "OFFICE OF THE UNIVERSITY REGISTRAR"
+        e4.value = "Legazpi City"
+        e5.value = "Tel. No.: (052) 820-6809" 
+        e6.value = "e-mail add: bu_uro@yahoo.com"
+
+        e10.value = "C E R T I F I C A T I O N"
+        b14.value = "TO WHOM IT MAY CONCERN:"
+        b16.value = "This is to certify that" +honorific[student.gender]+ " " +student.first_name+ " " +student.middle_name+". " +student.last_name+ "has graduated with the degree of " +student.program_id.name+ " " +student.program_id.abbreviation+ " from Bicol University, Legazpi City " +student.date_graduated.strftime("%B %d, %Y")+ " per on Referendum No.of the Board of Regents, Bicol University."
+        b18.value = "It is further certified that ENGLISH LANGUAGE is the medium of instruction in the Tertiary Level  courses of Bicol University."
+        b20.value =  "Issued this " + EAMOI_Cert.date_issued.strftime("%dsuffix day of %B, %Y").replace('suffix', str(suffix_generator(EAMOI_Cert.date_issued.day)) ) +  " upon the request of " +honorific[student.gender]+ " " +student.last_name+ " for reference purposes."
+        g25.value = f'{registrar.name}'.upper()
+        g26.value = f'{registrar.position}'
+        g36.value = 'Revision:'f'{EAMOI_Cert.revision}'
+        a36.value = "BU-F-UREG-09"
+        g37.value = "Effectivity Date:" +EAMOI_Cert.cert_effectivity.strftime("%B %d, %Y")
+
+        file = f'applications/new_ors/{file_name}'
+        wb.save(filename=file)
+
+        from gluon.contenttype import contenttype
+        response.headers['Content-Type'] = contenttype('xlsx')
+        response.headers['Content-disposition'] = f'attachment; filename={file_name}'
+        response.stream(file)
 
 def suffix_generator(d):
     return 'th' if 11<=d<=13 else {1:'st',2:'nd',3:'rd'}.get(d%10, 'th')
