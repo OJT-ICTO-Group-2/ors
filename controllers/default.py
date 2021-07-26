@@ -790,6 +790,7 @@ def EAMOI_Certification():
         b20.alignment = Alignment(indent = 5)
         g25 = sheet.cell(row = 25, column = 7)
         g25.alignment = Alignment(horizontal='center')
+        g25.font = Font(bold = True)
         g26 = sheet.cell(row = 26, column = 7)
         g26.alignment = Alignment(horizontal='center')
         g36 = sheet.cell(row = 36, column = 8)
